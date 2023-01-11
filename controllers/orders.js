@@ -9,6 +9,9 @@ const Products = require("../models/Products");
 const Promotion = require("../models/Promotion");
 const moment = require("moment");
 const { default: mongoose } = require("mongoose");
+const Orders = require("../models/Orders");
+const xl = require('excel4node');
+const { get, clone, isString, isFunction } = require("lodash");
 
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
@@ -240,19 +243,19 @@ exports.getAllOrders = async (req, res) => {
     const orders =
       done === "all"
         ? await Order.find()
-            .populate("customer")
-            .populate({
-              path: "products",
-              populate: {
-                path: "product",
-                model: "Product",
-              },
-            })
-            .sort({ date: -1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
+          .populate("customer")
+          .populate({
+            path: "products",
+            populate: {
+              path: "product",
+              model: "Product",
+            },
+          })
+          .sort({ date: -1 })
+          .limit(limit * 1)
+          .skip((page - 1) * limit)
         : done === "false"
-        ? await Order.find({
+          ? await Order.find({
             $or: [{ status: 0 }, { status: 1 }, { status: 3 }],
           })
             .populate("customer")
@@ -266,7 +269,7 @@ exports.getAllOrders = async (req, res) => {
             .sort({ date: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-        : await Order.find({ status: 2 })
+          : await Order.find({ status: 2 })
             .populate("customer")
             .populate({
               path: "products",
@@ -481,3 +484,100 @@ exports.executeDeliveryOccur = async (req, res) => {
     console.log("err", err);
   }
 };
+exports.exportOrdersAsExcelFile = async (req, res) => {
+  try {
+    const from = moment(req.query?.from || moment(new Date()).subtract(30, 'days')).toDate()
+    const to = moment(req.query?.to || moment(new Date())).toDate()
+    const orders = await Orders.find({
+      // status: 2,
+      date: {
+        $gte: from,
+        $lte: to
+      }
+    }).populate({
+      path: 'products',
+      populate: {
+        path: 'product',
+      }
+    }).populate({
+      path: 'customer',
+      populate: {
+        path: 'organization'
+      },
+      // select: { 'businessname': 1, customername: 1, 'organization.name': 1 }
+    })
+
+
+    const wb = new xl.Workbook()
+    const ws = wb.addWorksheet('Orders');
+    var orderFieldsStyle = wb.createStyle({
+      font: {
+        color: '#FFFFFF',
+        size: 12,
+      },
+      fill: {
+        type: "pattern",
+        patternType: "solid",
+        bgColor: "#000000",
+        fgColor: "#000000"
+      }
+    });
+    var productFieldsStyle = wb.createStyle({
+      font: {
+        color: '#000000',
+        size: 12,
+      },
+      fill: {
+        type: "pattern",
+        patternType: "solid",
+        bgColor: "#e1e1e1",
+        fgColor: "#e1e1e1"
+      }
+    });
+    const orderFields = [
+      { name: 'Code ID', value: 'customer.codeid' },
+      { name: 'Business Name', value: 'customer.businessname' },
+      { name: 'Customer Name', value: 'customer.customername' },
+      { name: 'Phone Number', value: 'customer.phonenumber' },
+      { name: 'Total Orders', value: 'customer.totalOrders', type: 'number' },
+      { name: 'Organization', value: 'customer.organization.name' },
+    ]
+    const productFields = [
+      { name: 'Product Name', value: 'product.name' },
+      { name: 'Qunatity', value: 'quantity', type: 'number' },
+      { name: 'Total', type: 'number', value: (orderProd) => orderProd.quantity * (orderProd.product?.promotionPrice || orderProd.product?.price) }
+    ]
+    orderFields.forEach((field, i) => {
+      ws.cell(1, i + 1).string(field.name)
+        .style(orderFieldsStyle);
+    })
+
+    let row = 2; //starting after header row
+    orders.forEach((order) => {
+      orderFields.forEach((field, col) => {
+        const val = isFunction(field.value) ? field.value(product) : get(order, field.value)
+        const defaultVal = field.type == 'number' ? 0 : ''
+        ws.cell(row, col + 1)[field.type || 'string'](val || defaultVal)
+      })
+      row++
+      productFields.forEach((field, col) => {
+        ws.cell(row, col + 1).string(field.name)
+          .style(productFieldsStyle);
+      })
+      row++
+      order.products.forEach((product) => {
+        productFields.forEach((field, col) => {
+          const val = isFunction(field.value) ? field.value(product) : get(product, field.value)
+          const defaultVal = field.type == 'number' ? 0 : ''
+          ws.cell(row, col + 1)[field.type || 'string'](val || defaultVal).style(productFieldsStyle);
+        })
+        row++
+        ws.cell(row, productFields.length).number(order.totalamount || 0).style(productFieldsStyle);
+      })
+      row += 2 //add two extra rows after each order
+    })
+    return wb.write('Orders.xlsx', res);
+  } catch (e) {
+    return res.status(400).json({ message: 'cannot download the excel file' })
+  }
+}
