@@ -3,10 +3,6 @@ const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
 
 exports.updateUser = async (req, res) => {
-  const { name, username, email, password, phonenumber } = req.body;
-  if (!name && !username && !email && !password && !phonenumber) {
-    return res.status(400).json("Please enter at least one valid parameter !");
-  }
   if (req.body.password) {
     req.body.password = CryptoJS.AES.encrypt(
       req.body.password,
@@ -28,7 +24,6 @@ exports.updateUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deteleUser = async (req, res) => {
   try {
     const ordersWithThisUser = await Order.find({
@@ -50,7 +45,6 @@ exports.deteleUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -62,7 +56,6 @@ exports.getUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllUsers = async (req, res) => {
   try {
     const { page, limit } = req.query;
@@ -85,7 +78,6 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.findUsersByTextSearch = async (req, res) => {
   const { find, page, limit } = req.query;
   try {
