@@ -133,7 +133,7 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
         );
     let customers = await Customer.find({ isarchived: isarchived })
       .populate("paymentmethod")
-      .sort({ _id: -1 })
+      .sort("customername")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
