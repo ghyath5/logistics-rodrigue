@@ -244,19 +244,19 @@ exports.getAllOrders = async (req, res) => {
     const orders =
       done === "all"
         ? await Order.find()
-            .populate("customer")
-            .populate({
-              path: "products",
-              populate: {
-                path: "product",
-                model: "Product",
-              },
-            })
-            .sort({ date: -1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
+          .populate("customer")
+          .populate({
+            path: "products",
+            populate: {
+              path: "product",
+              model: "Product",
+            },
+          })
+          .sort({ date: -1 })
+          .limit(limit * 1)
+          .skip((page - 1) * limit)
         : done === "false"
-        ? await Order.find({
+          ? await Order.find({
             $or: [{ status: 0 }, { status: 1 }, { status: 3 }],
           })
             .populate("customer")
@@ -270,7 +270,7 @@ exports.getAllOrders = async (req, res) => {
             .sort({ date: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
-        : await Order.find({ status: 2 })
+          : await Order.find({ status: 2 })
             .populate("customer")
             .populate({
               path: "products",
@@ -490,12 +490,10 @@ exports.executeDeliveryOccur = async (req, res) => {
 };
 exports.exportOrdersAsExcelFile = async (req, res) => {
   try {
-    const from = moment(
-      req.query?.from || moment(new Date()).subtract(30, "days")
-    ).toDate();
-    const to = moment(req.query?.to || moment(new Date())).toDate();
+    const from = moment(req.query?.from || moment(new Date()).subtract(30, 'days')).toDate()
+    const to = moment(req.query?.to || moment(new Date())).add(1, 'days').toDate()
     const orders = await Orders.find({
-      // status: 2,
+      status: 2,
       date: {
         $gte: from,
         $lte: to,
@@ -589,7 +587,7 @@ exports.exportOrdersAsExcelFile = async (req, res) => {
             : get(product, field.value);
           const defaultVal = field.type == "number" ? 0 : "";
           ws.cell(row, col + 1)
-            [field.type || "string"](val || defaultVal)
+          [field.type || "string"](val || defaultVal)
             .style(productFieldsStyle);
         });
         row++;
