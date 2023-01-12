@@ -335,14 +335,14 @@ exports.searchOrderByProductText = async (req, res) => {
             customer: { $in: customersPureIDS },
           },
           {
-            "products._id": { $in: productsPureIDS },
+            "products.product": { $in: productsPureIDS },
           },
         ],
       };
     } else {
       findQuery = { date: moment(name).format("L") };
     }
-    const orders = await Order.find(findQuery);
+    const orders = await Order.find(findQuery).populate('customer').populate('products.product')
     res.status(200).json(orders);
   } catch (err) {
     console.log("searchOrderByProductText err", err);
