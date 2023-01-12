@@ -7,38 +7,21 @@ const Category = require("../models/Category");
 const { default: mongoose } = require("mongoose");
 
 exports.createproduct = async (req, res) => {
-  const {
-    name,
-    categoryId,
-    unitesperbox,
-    prioritynumber,
-    price,
-    assignedCode,
-  } = req.body;
+  const { name, categoryId, assignedCode } = req.body;
 
-  if (
-    !name ||
-    !categoryId ||
-    !unitesperbox ||
-    !prioritynumber ||
-    !price ||
-    !assignedCode
-  ) {
+  if (!name || !categoryId) {
     return res.status(400).json("Please fill in all the fields");
   } else {
     const newProduct = new Products(req.body);
 
-    console.log("req.body", req.body);
-
-    const isNewProductCode = await Products.findOne({ assignedCode });
-    if (isNewProductCode)
-      return res.status(400).json({
-        success: false,
-        message:
-          "This product assigned code is already in use, please enter a different one",
-      });
-
     try {
+      const isNewProductCode = await Products.findOne({ assignedCode });
+      if (isNewProductCode)
+        return res.status(400).json({
+          success: false,
+          message:
+            "This product assigned code is already in use, please enter a different one",
+        });
       const productName = await Products.findOne({ name: req.body.name });
       if (productName) {
         return res
@@ -174,7 +157,6 @@ exports.findProductsByTextSearch = async (req, res) => {
       $or: [
         { name: { $regex: find, $options: "i" } },
         { assignedCode: { $regex: find, $options: "i" } },
-        { categoryId: { $regex: find, $options: "i" } },
       ],
     })
       .limit(limit * 1)

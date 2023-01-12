@@ -5,6 +5,11 @@ const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 const moment = require("moment");
 
+// 63bfdcf93c0361cc932597cb
+// 63bfdd3c3c0361cc932597d0
+// 63bfdd633c0361cc932597d5
+// 63bfdda23c0361cc932597da
+
 exports.createCostumer = async (req, res) => {
   const { businessname, email } = req.body;
   const newCustomer = new Customer(req.body);
@@ -17,7 +22,7 @@ exports.createCostumer = async (req, res) => {
   }
   newCustomer.codeid = codeid;
 
-  const businessnameUser = await User.findOne({ businessname });
+  const businessnameUser = await Customer.findOne({ businessname });
   if (businessnameUser) {
     return res.status(400).json({
       success: false,
@@ -26,7 +31,7 @@ exports.createCostumer = async (req, res) => {
     });
   }
 
-  const emailUser = await User.findOne({ email });
+  const emailUser = await Customer.findOne({ email });
   if (emailUser) {
     return res.status(400).json({
       success: false,
@@ -128,7 +133,7 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
         );
     let customers = await Customer.find({ isarchived: isarchived })
       .populate("paymentmethod")
-      .sort({ _id: -1 })
+      .sort("customername")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
@@ -150,6 +155,7 @@ exports.findCustomerByTextSearch = async (req, res) => {
         { customername: { $regex: find, $options: "i" } },
       ],
     })
+      .sort("customername")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 

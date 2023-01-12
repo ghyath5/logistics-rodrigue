@@ -13,7 +13,7 @@ const ProductSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     promotionPrice: { type: Number },
     unitesperbox: { type: Number, required: true },
-    prioritynumber: { type: Number, required: true },
+    prioritynumber: { type: Number, default: 0 },
     visibility: { type: Boolean, default: true },
   },
   { timestamps: true }

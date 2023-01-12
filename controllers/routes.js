@@ -1,4 +1,5 @@
 const Route = require("../models/Route");
+const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
 
 exports.createRoute = async (req, res) => {
@@ -39,6 +40,14 @@ exports.updateRoute = async (req, res) => {
 };
 exports.deleteRoute = async (req, res) => {
   try {
+    const routeHasCustomers = await Customer.find({ routeId: req.params.id });
+
+    if (routeHasCustomers.length)
+      return res.status(403).json({
+        success: false,
+        message: "Route is associated with customers, cannot be deleted",
+      });
+
     await Route.findByIdAndDelete(req.params.id);
     res.status(200).json("Route has been deleted...");
   } catch (err) {

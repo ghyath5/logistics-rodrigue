@@ -14,7 +14,7 @@ exports.createVehicle = async (req, res) => {
           "This plate is already in use, try register with a different one",
       });
     const savedVehicle = await newVehicle.save();
-    res.status(200).json(savedVehicle);
+    res.status(201).json(savedVehicle);
   } catch (err) {
     await log(err);
     res.status(500).json(err);
@@ -44,7 +44,7 @@ exports.deleteVehicle = async (req, res) => {
     const ordersWithThisVehicle = await Run.find({
       vehicle: req.params.id,
     });
-    if (ordersWithThisVehicle?.length)
+    if (ordersWithThisVehicle.length)
       return res.status(403).json({
         success: false,
         message: "Cannot delete vehicle when associated to a run",

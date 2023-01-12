@@ -11,7 +11,7 @@ const CustomerSchema = new mongoose.Schema(
     customername: { type: String, required: true },
     email: { type: String },
     abn: { type: String },
-    phonenumber: { type: String, required: true },
+    phonenumber: { type: String },
     mobilenumber: { type: String },
     directdialnumber: { type: String },
     state: { type: String, required: true },
