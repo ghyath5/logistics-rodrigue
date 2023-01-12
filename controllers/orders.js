@@ -489,9 +489,9 @@ exports.executeDeliveryOccur = async (req, res) => {
 exports.exportOrdersAsExcelFile = async (req, res) => {
   try {
     const from = moment(req.query?.from || moment(new Date()).subtract(30, 'days')).toDate()
-    const to = moment(req.query?.to || moment(new Date())).toDate()
+    const to = moment(req.query?.to || moment(new Date())).add(1, 'days').toDate()
     const orders = await Orders.find({
-      // status: 2,
+      status: 2,
       date: {
         $gte: from,
         $lte: to
