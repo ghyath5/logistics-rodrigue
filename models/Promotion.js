@@ -26,4 +26,9 @@ const PromotionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// PromotionSchema.pre("remove", function (next) {
+//   // Remove all the assignment docs that reference the removed person.
+//   this.model("Customer").remove({ promotions: this._id }, next);
+// });
+
 module.exports = mongoose.model("Promotion", PromotionSchema);

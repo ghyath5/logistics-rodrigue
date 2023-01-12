@@ -1,4 +1,5 @@
 const Promotion = require("../models/Promotion");
+const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
 const Products = require("../models/Products");
 const Category = require("../models/Category");
@@ -69,7 +70,6 @@ exports.createpromotion = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.updatePromotion = async (req, res) => {
   const { productspromotion, categorypromotion, from, to } = req.body;
 
@@ -148,17 +148,33 @@ exports.updatePromotion = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.deletePromotion = async (req, res) => {
   try {
-    await Promotion.findByIdAndDelete(req.params.id);
-    res.status(200).json("Promotion has been deleted...");
+    const customers = await Customer.find({ promotions: req.params.id });
+    if (customers) {
+      let customersIds = customers.map(function (item) {
+        return item["_id"].toString();
+      });
+
+      for (let i = 0; i < customersIds.length; i++) {
+        await Customer.update(
+          { _id: customersIds[i] },
+          { $pull: { promotions: req.params.id } }
+        );
+      }
+
+      await Promotion.findByIdAndDelete(req.params.id);
+      res.status(200).json("Promotion has been deleted...");
+    } else {
+      await Promotion.findByIdAndDelete(req.params.id);
+      res.status(200).json("Promotion has been deleted...");
+    }
   } catch (err) {
     await log(err);
+    console.log("deletePromotion error", err);
     res.status(500).json(err);
   }
 };
-
 exports.getPromotion = async (req, res) => {
   try {
     const promotion = await Promotion.findById(req.params.id)
@@ -187,7 +203,6 @@ exports.getPromotion = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getAllPromotions = async (req, res) => {
   try {
     const promotions = await Promotion.find()
