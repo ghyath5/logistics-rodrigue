@@ -301,7 +301,7 @@ exports.searchOrderByProductText = async (req, res) => {
   try {
     let findQuery = {};
     if (!isDate) {
-      const productsIDSQuery = Products.find({
+      const productsIDSQuery = await Products.find({
         $or: [
           { name: { $regex: name, $options: "i" } },
           {
@@ -309,7 +309,8 @@ exports.searchOrderByProductText = async (req, res) => {
           },
         ],
       }).select("_id");
-      const customersIDSQuery = Customer.find({
+      console.log("productsIDSQuery", productsIDSQuery);
+      const customersIDSQuery = await Customer.find({
         $or: [
           { customername: { $regex: name, $options: "i" } },
           {
@@ -317,6 +318,7 @@ exports.searchOrderByProductText = async (req, res) => {
           },
         ],
       }).select("_id");
+      console.log("customersIDSQuery", customersIDSQuery);
 
       const [productsIDS, customersIDS] = await Promise.all([
         productsIDSQuery,
@@ -338,7 +340,7 @@ exports.searchOrderByProductText = async (req, res) => {
       findQuery = { date: moment(name).format("L") };
     }
     const orders = await Order.find(findQuery);
-    res.status(200).json({ orders });
+    res.status(200).json(orders);
   } catch (err) {
     console.log("searchOrderByProductText err", err);
   }
