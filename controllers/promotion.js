@@ -157,7 +157,7 @@ exports.deletePromotion = async (req, res) => {
       });
 
       for (let i = 0; i < customersIds.length; i++) {
-        await Customer.update(
+        await Customer.updateOne(
           { _id: customersIds[i] },
           { $pull: { promotions: req.params.id } }
         );
