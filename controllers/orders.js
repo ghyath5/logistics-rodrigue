@@ -313,7 +313,6 @@ exports.searchOrderByProductText = async (req, res) => {
           },
         ],
       }).select("_id");
-
       const customersIDSQuery = await Customer.find({
         $or: [
           { customername: { $regex: name, $options: "i" } },
@@ -344,7 +343,8 @@ exports.searchOrderByProductText = async (req, res) => {
     }
     const orders = await Order.find(findQuery)
       .populate("customer")
-      .populate("products.product");
+      .populate("products.product")
+      .sort({ date: 1 });
     res.status(200).json(orders);
   } catch (err) {
     console.log("searchOrderByProductText err", err);
