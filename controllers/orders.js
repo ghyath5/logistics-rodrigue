@@ -6,7 +6,6 @@ const { getComingRuns, getAllComingRuns } = require("./runs");
 const { getCostumerInternally } = require("./costumer");
 const Customer = require("../models/Customer");
 const Products = require("../models/Products");
-const Promotion = require("../models/Promotion");
 const moment = require("moment");
 const { default: mongoose } = require("mongoose");
 const Orders = require("../models/Orders");
@@ -31,7 +30,19 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No customer is found by this Id!" });
     }
-    let products = await Products.find({ visibility: true })
+    let products = await Products.find({
+      $and: [
+        {
+          $or: [
+            { name: { $regex: find, $options: "i" } },
+            {
+              assignedCode: { $regex: find, $options: "i" },
+            },
+          ],
+        },
+        { visibility: true },
+      ],
+    })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .lean();
