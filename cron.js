@@ -3,7 +3,7 @@ const moment = require('moment');
 const Run = require('./models/Run');
 const Orders = require('./models/Orders');
 console.log('initalized');
-cron.schedule('*/18 * * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
     try {
         const runs = await Run.find({
             date: { $lt: moment(new Date()).toDate() },
