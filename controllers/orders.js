@@ -15,6 +15,7 @@ const { get, clone, isString, isFunction } = require("lodash");
 
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
+    const find = req.query?.find || "";
     const page = req.query?.page || 1;
     const limit = req.query?.limit || 30;
 

@@ -56,7 +56,10 @@ exports.createCostumer = async (req, res) => {
   }
 };
 exports.updateCostumer = async (req, res) => {
+  const { promotions } = req.body;
   try {
+    if (promotions) {
+    }
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       {
@@ -133,7 +136,7 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
         );
     let customers = await Customer.find({ isarchived: isarchived })
       .populate("paymentmethod")
-      .sort("customername")
+      .sort("businessname")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
@@ -155,14 +158,14 @@ exports.findCustomerByTextSearch = async (req, res) => {
         { customername: { $regex: find, $options: "i" } },
       ],
     })
-      .sort("customername")
+      .sort("businessname")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
     if (!found) return res.status(404).json("no customer was found");
     return res.status(200).json(found);
   } catch (err) {
-    console.log("err", err);
+    console.log("findCustomerByTextSearch err", err);
     await log(err);
     res.status(500).json(err);
   }
