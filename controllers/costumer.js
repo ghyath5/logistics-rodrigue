@@ -5,6 +5,11 @@ const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 const moment = require("moment");
 
+// 63bfdcf93c0361cc932597cb
+// 63bfdd3c3c0361cc932597d0
+// 63bfdd633c0361cc932597d5
+// 63bfdda23c0361cc932597da
+
 exports.createCostumer = async (req, res) => {
   const { businessname, email } = req.body;
   const newCustomer = new Customer(req.body);
@@ -150,6 +155,7 @@ exports.findCustomerByTextSearch = async (req, res) => {
         { customername: { $regex: find, $options: "i" } },
       ],
     })
+      .sort("customername")
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
