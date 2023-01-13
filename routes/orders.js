@@ -29,8 +29,7 @@ router
 router.route("/findbytext").post(verifyTokenAndAdmin, searchOrderByProductText);
 
 router.route("/deliveryoccur").post(verifyTokenAndAdmin, executeDeliveryOccur);
-//router.route("/export").get(verifyTokenAndAdmin, exportOrdersAsExcelFile);
-router.route("/export").get(exportOrdersAsExcelFile);
+router.route("/export").get(verifyTokenAndAdmin, exportOrdersAsExcelFile);
 
 router
   .route("/:id")

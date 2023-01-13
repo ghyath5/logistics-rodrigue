@@ -1,4 +1,5 @@
 const Customer = require("../models/Customer");
+const Vehicle = require("../models/Vehicle");
 const Run = require("../models/Run");
 const Order = require("../models/Orders");
 const Sharedrecords = require("../models/Sharedrecords");
@@ -227,14 +228,23 @@ exports.getTopCustomers = async (req, res) => {
     let todayOrders = todayOrdersArray.length || 0;
     let todayRuns = todayRunsArray.length || 0;
 
+    let datee = new Date();
+    let carefulDate = datee.setDate(datee.getDate() + 15);
+    let myDate = new Date(carefulDate);
+    const vehicles = await Vehicle.aggregate([
+      { $match: { expiresIn: { $lte: myDate } } },
+    ]);
+
     res.json({
       data: totalOrdersAmount,
       labels: names,
       todayRuns,
       todayOrders,
       todayDeliveredOrders,
+      vehicles,
     });
   } catch (err) {
+    console.log("getTopCustomers err", err);
     await log(err);
     res.status(500).json(err);
   }
