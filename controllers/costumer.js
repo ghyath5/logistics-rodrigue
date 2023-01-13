@@ -231,9 +231,22 @@ exports.getTopCustomers = async (req, res) => {
     let datee = new Date();
     let carefulDate = datee.setDate(datee.getDate() + 15);
     let myDate = new Date(carefulDate);
-    const vehicles = await Vehicle.aggregate([
-      { $match: { expiresIn: { $lte: myDate } } },
-    ]);
+
+    const vehicles = await Vehicle.find();
+    let vehiclesToUpdate = [];
+    for (let i = 0; i < vehicles.length; i++) {
+      if (vehicles[i].expiresIn < myDate) {
+        vehiclesToUpdate.push(vehicles[i]);
+      } else {
+        continue;
+      }
+    }
+
+    for (let i = 0; i < vehiclesToUpdate.length; i++) {
+      await Vehicle.findByIdAndUpdate(vehiclesToUpdate[i]._id.toString(), {
+        status: 0,
+      });
+    }
 
     res.json({
       data: totalOrdersAmount,
