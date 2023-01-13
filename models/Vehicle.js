@@ -9,20 +9,18 @@ const VehicleSchema = new mongoose.Schema(
     expiresIn: { type: Date },
     lastUsed: { type: Date },
     manufactureyear: { type: Number },
-    status: { type: Number, default: 0 },
+    status: { type: Number, default: 1 },
   },
   { timestamps: true }
 );
 
 VehicleSchema.methods.isAvailable = async function () {
   try {
-    const run = await Run.exists({ vehicle: this._id, status: { $lte: 1 } })
-    return !Boolean(run)
+    const run = await Run.exists({ vehicle: this._id, status: { $lte: 1 } });
+    return !Boolean(run);
   } catch (e) {
     return true;
   }
 };
-
-
 
 module.exports = mongoose.model("Vehicle", VehicleSchema);
