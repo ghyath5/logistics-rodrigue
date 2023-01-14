@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
+const CryptoJS = require("crypto-js");
 
 exports.updateUser = async (req, res) => {
   if (req.body.password) {
