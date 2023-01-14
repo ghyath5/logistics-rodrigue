@@ -5,7 +5,7 @@ const { log } = require("../helpers/Loger");
 
 exports.createDeliveryOccur = async (req, res) => {
   const newDeliveryOccur = new DeliveryOccur(req.body);
-  const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
+  const codeSequence = await Sharedrecords.findById("63c2de54a036aba6ceac44c4");
   let codeid = codeSequence.deliveryoccurcodeid;
 
   newDeliveryOccur.number = codeid;
@@ -21,7 +21,7 @@ exports.createDeliveryOccur = async (req, res) => {
       const savedDeliveryOccur = await newDeliveryOccur.save();
       res.status(200).json(savedDeliveryOccur);
       await Sharedrecords.findByIdAndUpdate(
-        "63663fa59b531a420083d78f",
+        "63c2de54a036aba6ceac44c4",
         {
           $inc: { deliveryoccurcodeid: 1 },
         },

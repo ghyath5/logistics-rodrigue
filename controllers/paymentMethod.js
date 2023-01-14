@@ -5,7 +5,7 @@ const { log } = require("../helpers/Loger");
 
 exports.createPaymentMethod = async (req, res) => {
   const newPaymentmethod = new Paymentmethod(req.body);
-  const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
+  const codeSequence = await Sharedrecords.findById("63c2de54a036aba6ceac44c4");
   let codeid = codeSequence.paymentmethodcodeid;
   newPaymentmethod.number = codeid;
   try {
@@ -20,7 +20,7 @@ exports.createPaymentMethod = async (req, res) => {
       const savedPaymentmethod = await newPaymentmethod.save();
       res.status(200).json(savedPaymentmethod);
       await Sharedrecords.findByIdAndUpdate(
-        "63663fa59b531a420083d78f",
+        "63c2de54a036aba6ceac44c4",
         {
           $inc: { paymentmethodcodeid: 1 },
         },
