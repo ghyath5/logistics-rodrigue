@@ -3,8 +3,12 @@ const dotenv = require("dotenv");
 const express = require("express");
 const mongoose = require("mongoose");
 const compression = require("compression");
-require('./cron')
+require("./cron");
 const app = express();
+
+// https://monjay.app.qore.com.au/customers/add
+// admin@mjmezza.com.au
+// Holden15
 
 const {
   authRoute,
@@ -25,10 +29,6 @@ const {
   statisticsRoute,
   driversRoute,
 } = require("./routes");
-
-// https://monjay.app.qore.com.au/customers/add
-// admin@mjmezza.com.au
-// Holden15
 
 dotenv.config();
 
