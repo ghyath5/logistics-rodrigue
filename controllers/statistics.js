@@ -104,7 +104,6 @@ exports.getSalesByDateRange = async (req, res) => {
       const d = m.date();
       labels.push(d);
       const order = orders.find((order) => {
-        console.log(order._id, m.format("YYYY-MM-DD"));
         return order._id == m.format("YYYY-MM-DD");
       });
       dataset1.push(order?.totalAmount ?? 0);
