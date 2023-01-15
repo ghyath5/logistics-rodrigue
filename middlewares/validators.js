@@ -74,11 +74,6 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Deliveryoccur is required"),
-  check("isconsolidatedbiller")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Consolidated biller is required"),
   check("postcode").trim().not().isEmpty().withMessage("Post code is required"),
   check("state").trim().not().isEmpty().withMessage("State is required"),
 ];

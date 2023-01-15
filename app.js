@@ -78,3 +78,7 @@ app.listen(process.env.PORT || 5000, () => {
 // 401 : UNAUTHORIZED
 // 403 : FORBIDDEN
 // 404 : NOT FOUND
+
+//title above bar chart :  sales analysis
+//add order table
+// change "name" to "product name" in create order
