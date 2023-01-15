@@ -14,7 +14,7 @@ const moment = require("moment");
 exports.createCostumer = async (req, res) => {
   const { businessname, email } = req.body;
   const newCustomer = new Customer(req.body);
-  const codeSequence = await Sharedrecords.findById("63c2de54a036aba6ceac44c4");
+  const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.customercodeid;
   codeid = codeid.toString();
 
@@ -44,7 +44,7 @@ exports.createCostumer = async (req, res) => {
     const savedCustomer = await newCustomer.save();
     res.status(200).json(savedCustomer);
     await Sharedrecords.findByIdAndUpdate(
-      "63c2de54a036aba6ceac44c4",
+      "63663fa59b531a420083d78f",
       {
         $inc: { customercodeid: 1 },
       },

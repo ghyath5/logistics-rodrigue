@@ -29,7 +29,7 @@ exports.createproduct = async (req, res) => {
           .json("a product with this name has already been created");
       } else {
         const codeSequence = await Sharedrecords.findById(
-          "63c2de54a036aba6ceac44c4"
+          "63663fa59b531a420083d78f"
         );
         let codeid = codeSequence.productcodeid;
         codeid = codeid.toString();
@@ -39,7 +39,7 @@ exports.createproduct = async (req, res) => {
         newProduct.generatedCode = codeid;
         let savedProduct = await newProduct.save();
         res.status(200).json(savedProduct);
-        await Sharedrecords.findByIdAndUpdate("63c2de54a036aba6ceac44c4", {
+        await Sharedrecords.findByIdAndUpdate("63663fa59b531a420083d78f", {
           $inc: { productcodeid: 1 },
         });
       }

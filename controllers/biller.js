@@ -4,7 +4,7 @@ const { log } = require("../helpers/Loger");
 
 exports.createBiller = async (req, res) => {
   const newBiller = new Biller(req.body);
-  const codeSequence = await Sharedrecords.findById("63c2de54a036aba6ceac44c4");
+  const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.billercodeid;
 
   newBiller.number = codeid;
@@ -18,7 +18,7 @@ exports.createBiller = async (req, res) => {
       const savedBiller = await newBiller.save();
       res.status(200).json(savedBiller);
       await Sharedrecords.findByIdAndUpdate(
-        "63c2de54a036aba6ceac44c4",
+        "63663fa59b531a420083d78f",
         {
           $inc: { billercodeid: 1 },
         },
