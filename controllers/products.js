@@ -31,19 +31,14 @@ exports.createproduct = async (req, res) => {
         const codeSequence = await Sharedrecords.findById(
           "63c2de54a036aba6ceac44c4"
         );
-
         let codeid = codeSequence.productcodeid;
         codeid = codeid.toString();
-
         while (codeid.length < 4) {
           codeid = "0" + codeid;
         }
         newProduct.generatedCode = codeid;
-
         let savedProduct = await newProduct.save();
-
         res.status(200).json(savedProduct);
-
         await Sharedrecords.findByIdAndUpdate("63c2de54a036aba6ceac44c4", {
           $inc: { productcodeid: 1 },
         });

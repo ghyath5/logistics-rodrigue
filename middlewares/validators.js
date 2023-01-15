@@ -131,11 +131,7 @@ exports.creatingRoute = [
     .not()
     .isEmpty()
     .withMessage("Route description is missing"),
-  check("places")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Route places are missing"),
+  check("places").not().isEmpty().withMessage("Route places are missing"),
   check("from")
     .trim()
     .not()
