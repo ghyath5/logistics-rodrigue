@@ -251,7 +251,6 @@ exports.getOrdersByDate = async (req, res) => {
   try {
     let beginningOfDay = moment(date).toDate();
     let endingOfDay = moment(date).add(1, "days").toDate();
-
     const orders = await Order.find({
       date: {
         $gte: beginningOfDay,
