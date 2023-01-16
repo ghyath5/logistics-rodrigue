@@ -246,6 +246,29 @@ exports.getOrder = async (req, res) => {
     res.status(500).json(err);
   }
 };
+exports.getOrdersByDate = async (req, res) => {
+  const { date } = req.query;
+  try {
+    let beginningOfDay = moment(date).toDate();
+    let endingOfDay = moment(date).add(1, "days").toDate();
+
+    const orders = await Order.find({
+      date: {
+        $gte: beginningOfDay,
+        $lte: endingOfDay,
+      },
+    });
+    if (orders.length)
+      return res.status(200).json({ success: true, data: orders });
+    return res
+      .status(404)
+      .json({ success: true, message: "no order were found at that date" });
+  } catch (err) {
+    console.log("getOrdersByDate err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
 exports.getAllOrders = async (req, res) => {
   const { limit, page, done } = req.query;
   //all 0 1 2 3

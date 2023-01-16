@@ -9,6 +9,7 @@ const {
   searchOrderByProductText,
   executeDeliveryOccur,
   exportOrdersAsExcelFile,
+  getOrdersByDate,
 } = require("../controllers/orders");
 const {
   validateMongoId,
@@ -25,6 +26,8 @@ router
   .route("/")
   .post(verifyTokenAndAdmin, creatingOrder, validate, createOrder)
   .get(verifyTokenAndAdmin, getAllOrders);
+
+router.route("/getordersbydate").get(verifyTokenAndAdmin, getOrdersByDate);
 
 router.route("/findbytext").post(verifyTokenAndAdmin, searchOrderByProductText);
 
