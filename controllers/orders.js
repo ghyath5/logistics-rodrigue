@@ -256,12 +256,14 @@ exports.getOrdersByDate = async (req, res) => {
         $gte: beginningOfDay,
         $lte: endingOfDay,
       },
-    });
-    if (orders.length)
+    })
+      .populate("customer")
+      .populate("products");
+    if (orders.length) {
       return res.status(200).json({ success: true, data: orders });
-    return res
-      .status(404)
-      .json({ success: true, message: "no order were found at that date" });
+    } else {
+      return res.status(200).json({ message: success, data: [] });
+    }
   } catch (err) {
     console.log("getOrdersByDate err", err);
     await log(err);
