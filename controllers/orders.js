@@ -10,7 +10,7 @@ const moment = require("moment");
 const { default: mongoose } = require("mongoose");
 const Orders = require("../models/Orders");
 const xl = require("excel4node");
-const { get, isFunction } = require("lodash");
+const { get, isFunction, stubTrue } = require("lodash");
 
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
@@ -258,11 +258,17 @@ exports.getOrdersByDate = async (req, res) => {
       },
     })
       .populate("customer")
-      .populate("products");
+      .populate({
+        path: "products",
+        populate: {
+          path: "product",
+          model: "Product",
+        },
+      });
     if (orders.length) {
       return res.status(200).json({ success: true, data: orders });
     } else {
-      return res.status(200).json({ message: success, data: [] });
+      return res.status(200).json({ success: true, data: [] });
     }
   } catch (err) {
     console.log("getOrdersByDate err", err);
