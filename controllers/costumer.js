@@ -247,14 +247,14 @@ exports.getTopCustomers = async (req, res) => {
         status: 0,
       });
     }
-
+    const outDatedVehicles = await Vehicle.find({ status: 0 });
     res.json({
       data: totalOrdersAmount,
       labels: names,
       todayRuns,
       todayOrders,
       todayDeliveredOrders,
-      vehicles,
+      vehicles: outDatedVehicles,
     });
   } catch (err) {
     console.log("getTopCustomers err", err);
