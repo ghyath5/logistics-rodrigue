@@ -6,7 +6,7 @@ const CustomerSchema = new mongoose.Schema(
     businessname: { type: String, required: true },
     address: { type: [String], required: true },
     isarchived: { type: Boolean, default: false },
-    suburb: { type: String  },
+    suburb: { type: String },
     notes: { type: String },
     customername: { type: String, required: true },
     email: { type: String },
@@ -54,28 +54,3 @@ const CustomerSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Customer", CustomerSchema);
-
-
-
-//===============================
-
-
-
-     suburb: { type: String, required: true },
-     abn: { type: String },
-       deliveryoccur: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Deliveriesoccur",
-      required: true,
-    },
-    preferredtimes: [
-      {
-        day: { type: String },
-        daystoremind: { type: Number },
-        from: { type: Date },
-        to: { type: Date },
-      },
-    ],
- 
- 
- 
