@@ -232,11 +232,11 @@ exports.getTopCustomers = async (req, res) => {
     let carefulDate = datee.setDate(datee.getDate() + 15);
     let myDate = new Date(carefulDate);
 
-    const vehicles = await Vehicle.find();
+    const allVehicles = await Vehicle.find();
     let vehiclesToUpdate = [];
-    for (let i = 0; i < vehicles.length; i++) {
-      if (vehicles[i].expiresIn < myDate) {
-        vehiclesToUpdate.push(vehicles[i]);
+    for (let i = 0; i < allVehicles.length; i++) {
+      if (allVehicles[i].expiresIn < myDate) {
+        vehiclesToUpdate.push(allVehicles[i]);
       } else {
         continue;
       }
@@ -247,7 +247,8 @@ exports.getTopCustomers = async (req, res) => {
         status: 0,
       });
     }
-    vehicles = vehicles.filter((vehicle) => (vehicle.status = 0));
+    console.log("allVehicles", allVehicles);
+    let vehicles = allVehicles.filter((vehicle) => vehicle.status == 0);
     res.json({
       data: totalOrdersAmount,
       labels: names,
