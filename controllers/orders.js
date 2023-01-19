@@ -593,7 +593,7 @@ exports.exportOrdersAsExcelFile = async (req, res) => {
     ];
     const productFields = [
       { name: "Product Name", value: "product.name" },
-      { name: "Qunatity", value: "quantity", type: "number" },
+      { name: "Quantity", value: "quantity", type: "number" },
       {
         name: "Total",
         type: "number",
