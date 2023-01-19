@@ -555,7 +555,6 @@ exports.exportOrdersAsExcelFile = async (req, res) => {
         populate: {
           path: "organization",
         },
-        // select: { 'businessname': 1, customername: 1, 'organization.name': 1 }
       });
 
     const wb = new xl.Workbook();

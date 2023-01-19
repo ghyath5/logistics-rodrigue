@@ -211,6 +211,7 @@ exports.getTopCustomers = async (req, res) => {
       { $sort: { totalOrdersAmount: -1 } },
       { $limit: total },
     ]);
+    console.log("topCustomers", topCustomers);
     const names = topCustomers.map((cust) => cust.name);
     const totalOrdersAmount = topCustomers.map(
       (cust) => cust.totalOrdersAmount
@@ -247,7 +248,7 @@ exports.getTopCustomers = async (req, res) => {
         status: 0,
       });
     }
-    console.log("allVehicles", allVehicles);
+
     let vehicles = allVehicles.filter((vehicle) => vehicle.status == 0);
     res.json({
       data: totalOrdersAmount,
