@@ -47,23 +47,22 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Business Name is missing"),
-  check("address")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Please provide at least one address"),
-  check("suburb").trim().not().isEmpty().withMessage("Suburb Name is missing"),
   check("email")
     .isEmail()
     .withMessage("Email is Invalid")
     .not()
     .isEmpty()
     .withMessage("Email is missing"),
-  check("customername")
+  check("firstname")
     .trim()
     .not()
     .isEmpty()
-    .withMessage("customer name is required"),
+    .withMessage("First Name name is required"),
+  check("lastname")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("Last Name name is required"),
   check("phonenumber")
     .trim()
     .not()
@@ -74,8 +73,14 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Deliveryoccur is required"),
-  check("postcode").trim().not().isEmpty().withMessage("Post code is required"),
-  check("state").trim().not().isEmpty().withMessage("State is required"),
+  check("postcode")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("Postal code is required"),
+  check("region").trim().not().isEmpty().withMessage("Region is required"),
+  check("city").trim().not().isEmpty().withMessage("City is required"),
+  check("address").trim().not().isEmpty().withMessage("Address is required"),
 ];
 // Creating Promotion
 exports.creatingPromotion = [

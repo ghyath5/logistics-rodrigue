@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const compression = require("compression");
 require("./cron");
 const app = express();
+const bodyParser = require("body-parser");
 
 // https://monjay.app.qore.com.au/customers/add
 //
@@ -35,13 +36,14 @@ const {
   organizationRoute,
   statisticsRoute,
   driversRoute,
+  webhookRoute,
 } = require("./routes");
 
 dotenv.config();
 
 const connectWithRetry = () => {
   mongoose
-    .connect(process.env.MONGO_URL)
+    .connect(process.env.MONGO_URL || "mongodb://0.0.0.0:27017/monjay")
     .then(() => console.log("DB Connection Successfull!"))
     .catch((err) => {
       console.log(err);
@@ -52,8 +54,10 @@ const connectWithRetry = () => {
 connectWithRetry();
 
 app.use(cors());
-app.use(express.json());
 app.use(compression());
+
+app.use("/api/webhook", bodyParser.raw({ type: "application/json" }));
+app.use(express.json());
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", authRoute);
@@ -73,10 +77,19 @@ app.use("/api/vehicles", vehiclesRoute);
 app.use("/api/people", peopleRoute);
 app.use("/api/organization", organizationRoute);
 app.use("/api/statistics", statisticsRoute);
+app.use("/api/webhook", webhookRoute);
 
 app.listen(process.env.PORT || 5000, () => {
-  console.log("Backend server is running!");
+  console.log(`Server is running on port ${process.env.PORT || 5000}`);
 });
+
+const xeroHelper = require("./helpers/Xero");
+// xeroHelper
+//   .createCustomers()
+//   .then(() => console.log("done"))
+//   .catch((err) => console.log("Error:", err.response));
+
+// xeroHelper.getCustomer("65646100-16b8-4922-bd73-b847828501ef");
 
 // 200 : OK
 // 201 : CREATED

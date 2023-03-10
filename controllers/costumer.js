@@ -6,6 +6,8 @@ const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 const moment = require("moment");
 
+const XeroHelper = require("../helpers/Xero");
+
 // 63bfdcf93c0361cc932597cb
 // 63bfdd3c3c0361cc932597d0
 // 63bfdd633c0361cc932597d5
@@ -28,20 +30,21 @@ exports.createCostumer = async (req, res) => {
     return res.status(400).json({
       success: false,
       message:
-        "This businessname is already in use, try sign-in with a different one",
+        "This businessname is already in use, please choose a different one",
     });
   }
 
-  const emailUser = await Customer.findOne({ email });
-  if (emailUser) {
-    return res.status(400).json({
-      success: false,
-      message: "This email is already in use, try sign-in with a different one",
-    });
-  }
+  // const emailUser = await Customer.findOne({ email });
+  // if (emailUser) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "This email is already in use, try sign-in with a different one",
+  //   });
+  // }
 
   try {
     const savedCustomer = await newCustomer.save();
+    await XeroHelper.synchCustomerToXero(savedCustomer);
     res.status(200).json(savedCustomer);
     await Sharedrecords.findByIdAndUpdate(
       "63663fa59b531a420083d78f",
@@ -69,6 +72,7 @@ exports.updateCostumer = async (req, res) => {
       { new: true }
     );
     if (updatedCustomer) {
+      await XeroHelper.synchCustomerToXero(updatedCustomer);
       res.status(200).json(updatedCustomer);
     } else {
       res.status(404).json("no costumer was found with this id");
