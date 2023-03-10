@@ -7,7 +7,7 @@ require("./cron");
 const app = express();
 const bodyParser = require("body-parser");
 
-// https://monjay.app.qore.com.au/customers/add
+// https://monjay.app.qore.com.au
 //
 // admin@mjmezza.com.au
 // Holden15
@@ -50,7 +50,7 @@ const connectWithRetry = () => {
       setTimeout(connectWithRetry, 5000);
     });
 };
-
+// special wrap ()
 connectWithRetry();
 
 app.use(cors());
@@ -98,6 +98,12 @@ const xeroHelper = require("./helpers/Xero");
 // 403 : FORBIDDEN
 // 404 : NOT FOUND
 
-//title above all charts : products and sales analysis
+// title above all charts : products and sales analysis
 // add notes to order creation
-//top selling product
+// top selling product
+
+//======================================
+//============================
+//============================
+//======================================
+// when creating an order it is being saved in Xero too

@@ -22,14 +22,7 @@ const CustomerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Deliveriesoccur",
     },
-    preferredtimes: [
-      {
-        day: { type: String },
-        daystoremind: { type: Number },
-        from: { type: Date },
-        to: { type: Date },
-      },
-    ],
+    preferredday: { type: String },
     totalOrders: { type: Number, default: 0 },
     paymentmethod: {
       type: mongoose.Schema.Types.ObjectId,
