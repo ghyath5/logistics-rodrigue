@@ -61,7 +61,7 @@ exports.updateRoute = async (req, res) => {
         if (route) {
           return res.status(400).json({
             success: false,
-            message: `Customer with id ${customers[i]} is already assigned to route ${route.name}`,
+            message: `${customer.businessname} is already assigned to route ${route.name}`,
           });
         }
       }
