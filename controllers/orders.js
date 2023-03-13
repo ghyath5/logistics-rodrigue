@@ -227,13 +227,19 @@ exports.deleteOrder = async (req, res) => {
 exports.getOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate({
-        path: "products",
-        populate: {
-          path: "product",
-          model: "Product",
+      .populate([
+        {
+          path: "products",
+          populate: {
+            path: "product",
+            model: "Product",
+          },
         },
-      })
+        {
+          path: "initiateduser",
+          model: "User",
+        },
+      ])
       .exec();
     if (order) {
       res.status(200).json(order);
