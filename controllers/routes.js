@@ -35,6 +35,13 @@ exports.createRoute = async (req, res) => {
     }
 
     const savedRoute = await newRoute.save();
+
+    for (let i = 0; i < customers.length; i++) {
+      await Customer.findByIdAndUpdate(customers[i], {
+        $set: { routeId: savedRoute._id },
+      });
+    }
+
     res.status(200).json(savedRoute);
   } catch (err) {
     await log(err);
@@ -75,6 +82,11 @@ exports.updateRoute = async (req, res) => {
       { new: true }
     );
     if (updatedRoute) {
+      for (let i = 0; i < customers.length; i++) {
+        await Customer.findByIdAndUpdate(customers[i], {
+          $set: { routeId: updatedRoute._id },
+        });
+      }
       res.status(200).json(updatedRoute);
     } else {
       res.status(404).json("No route was found with this id !");

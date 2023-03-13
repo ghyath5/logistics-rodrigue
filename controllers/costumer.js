@@ -3,6 +3,7 @@ const Vehicle = require("../models/Vehicle");
 const Run = require("../models/Run");
 const Order = require("../models/Orders");
 const Sharedrecords = require("../models/Sharedrecords");
+const Route = require("../models/Route");
 const { log } = require("../helpers/Loger");
 const moment = require("moment");
 
@@ -44,6 +45,9 @@ exports.createCostumer = async (req, res) => {
 
   try {
     const savedCustomer = await newCustomer.save();
+    await Route.findByIdAndUpdate(newCustomer.routeId, {
+      $push: { customers: savedCustomer._id },
+    });
     await XeroHelper.synchCustomerToXero(savedCustomer);
     res.status(200).json(savedCustomer);
     await Sharedrecords.findByIdAndUpdate(
@@ -72,6 +76,16 @@ exports.updateCostumer = async (req, res) => {
       { new: true }
     );
     if (updatedCustomer) {
+      const route = await Route.findOne({ customers: req.params.id });
+      if (route._id.toString() !== updatedCustomer.routeId.toString()) {
+        await Route.findByIdAndUpdate(route._id, {
+          $pull: { customers: req.params.id },
+        });
+        await Route.findByIdAndUpdate(updatedCustomer.routeId, {
+          $push: { customers: req.params.id },
+        });
+      }
+
       await XeroHelper.synchCustomerToXero(updatedCustomer);
       res.status(200).json(updatedCustomer);
     } else {
