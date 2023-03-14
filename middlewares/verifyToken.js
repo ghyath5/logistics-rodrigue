@@ -4,7 +4,6 @@ const verifyToken = (req, res, next) => {
   const authHeader = req.headers.token;
   if (authHeader) {
     const token = authHeader.split(" ")[1];
-    console.log(authHeader, token);
     jwt.verify(token, process.env.JWT_SEC, (err, user) => {
       //i personally added the return in the line below
       if (err)
@@ -39,8 +38,26 @@ const verifyTokenAndAdmin = (req, res, next) => {
   });
 };
 
+const verifyUpperAdmin = (req, res, next) => {
+  let token = req.headers.token;
+  if (!token) return res.status(404).json("Only admins can do that !");
+
+  verifyToken(req, res, () => {
+    if (
+      req.user.role &&
+      req.user.role == 1 &&
+      req.user.id.toString() === process.env.UPPER_ADMIN_ID
+    ) {
+      next();
+    } else {
+      res.status(403).json("Only admins can do such operations!");
+    }
+  });
+};
+
 module.exports = {
   verifyToken,
   verifyTokenAndAuthorization,
   verifyTokenAndAdmin,
+  verifyUpperAdmin,
 };

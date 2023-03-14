@@ -2,24 +2,20 @@ const router = require("express").Router();
 const {
   getUser,
   updateUser,
-  getAllUsers,
   deteleUser,
   findUsersByTextSearch,
 } = require("../controllers/users");
 const { validateMongoId, validate } = require("../middlewares/validators");
-const {
-  verifyTokenAndAdmin,
-  verifyTokenAndAuthorization,
-} = require("../middlewares/verifyToken");
+const { verifyUpperAdmin } = require("../middlewares/verifyToken");
 
 //=============================
 
 router
   .route("/:id")
-  .get(verifyTokenAndAdmin, getUser)
-  .put(verifyTokenAndAuthorization, validateMongoId, validate, updateUser)
-  .delete(verifyTokenAndAdmin, validateMongoId, validate, deteleUser);
+  .get(verifyUpperAdmin, getUser)
+  .put(verifyUpperAdmin, validateMongoId, validate, updateUser)
+  .delete(verifyUpperAdmin, validateMongoId, validate, deteleUser);
 
-router.route("/find").post(verifyTokenAndAdmin, findUsersByTextSearch);
+router.route("/find").post(verifyUpperAdmin, findUsersByTextSearch);
 
 module.exports = router;
