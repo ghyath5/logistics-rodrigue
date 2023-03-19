@@ -42,6 +42,10 @@ const CustomerSchema = new mongoose.Schema(
         ref: "Promotion",
       },
     ],
+    sheduledCall: {
+      date: { type: Date },
+      isCalled: { type: Boolean, default: false },
+    },
   },
   { timestamps: true }
 );

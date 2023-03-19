@@ -282,3 +282,69 @@ exports.getTopCustomers = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+exports.getCustomersToCall = async (req, res) => {
+  try {
+    const tomorrow = moment().add(1, "days").format("dddd").toLowerCase();
+
+    const customers = await Customer.find({
+      preferredday: tomorrow,
+      isarchived: false,
+      "deliveryoccur.number": { $ne: 0 },
+      $or: [
+        { sheduledCall: { $exists: false } },
+        {
+          "sheduledCall.date": {
+            $lte: moment().endOf("day").toDate(),
+            $gte: moment().startOf("day").toDate(),
+          },
+        },
+        {
+          "sheduledCall.date": {
+            $lte: moment().subtract(1, "weeks").endOf("day").toDate(),
+            $gte: moment().subtract(1, "weeks").startOf("day").toDate(),
+          },
+          "deliveryoccur.number": 1,
+        },
+        {
+          "sheduledCall.date": {
+            $lte: moment().subtract(2, "weeks").endOf("day").toDate(),
+            $gte: moment().subtract(2, "weeks").startOf("day").toDate(),
+          },
+          "deliveryoccur.number": 2,
+        },
+      ],
+    });
+
+    for (let customer of customers) {
+      customer.sheduledCall = {
+        date: moment().toDate(),
+        isCalled: customer.sheduledCall?.isCalled || false,
+      };
+      await customer.save();
+    }
+
+    res.status(200).json(customers);
+  } catch (err) {
+    console.log("getCustomersToCall err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.toggleCall = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customer = await Customer.findById(id);
+    if (!customer) return res.status(404).json("customer not found");
+
+    customer.sheduledCall.isCalled = !customer.sheduledCall.isCalled;
+    await customer.save();
+
+    res.status(200).json(customer);
+  } catch (err) {
+    console.log("markAsCalled err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
