@@ -21,8 +21,10 @@ exports.updateRun = async (req, res) => {
       },
       { new: true }
     ).populate("orders");
+
+    const ordersIds = updatedRun.orders.map((order) => order._id?.toString());
+    
     if (updatedRun.status >= 2) {
-      const ordersIds = updatedRun.orders.map((order) => order._id?.toString());
       await Orders.updateMany(
         {
           _id: { $in: ordersIds },
@@ -30,6 +32,17 @@ exports.updateRun = async (req, res) => {
         { $set: { status: updatedRun.status } }
       );
     }
+
+    // update all orders date in that run
+    if (updatedRun.date) {
+      await Orders.updateMany(
+        {
+          _id: { $in: ordersIds },
+        },
+        { $set: { date: updatedRun.date } }
+      );
+    }
+
     if (updatedRun) {
       res.status(200).json(updatedRun);
     } else {
