@@ -12,12 +12,20 @@ exports.createpromotion = async (req, res) => {
     let fromDate = new Date(from);
     let toDate = new Date(to);
 
-    if (toDate < now) {
+    if (toDate < now || fromDate < now) {
       return res.status(400).json({
         success: false,
         message: "Please enter dates in the future",
       });
     }
+
+    if (toDate < fromDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid date range",
+      });
+    }
+
     const newPromotion = new Promotion(req.body);
 
     let isProductPromotion = productspromotion.length != 0;

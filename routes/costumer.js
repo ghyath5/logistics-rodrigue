@@ -7,6 +7,8 @@ const {
   getCostumerPaginatedArchived,
   findCustomerByTextSearch,
   getTopCustomers,
+  getCustomersToCall,
+  toggleCall,
 } = require("../controllers/costumer");
 const {
   validateCreateCustomer,
@@ -17,13 +19,15 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 router.route("/find").post(verifyTokenAndAdmin, findCustomerByTextSearch);
 
-
 router.route("/get-top").get(verifyTokenAndAdmin, getTopCustomers);
 
 router
   .route("/")
   .post(verifyTokenAndAdmin, validateCreateCustomer, validate, createCostumer)
   .get(verifyTokenAndAdmin, getCostumerPaginatedArchived);
+
+router.route("/calls").get(verifyTokenAndAdmin, getCustomersToCall);
+router.route("/:id/calls").put(verifyTokenAndAdmin, toggleCall);
 
 router
   .route("/:id")

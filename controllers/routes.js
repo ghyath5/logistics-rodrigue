@@ -12,7 +12,36 @@ exports.createRoute = async (req, res) => {
         .status(399)
         .json({ success: false, message: "The route name already exists" });
     }
+
+    const { customers } = req.body;
+    if (customers) {
+      for (let i = 0; i < customers.length; i++) {
+        const customer = await Customer.findById(customers[i]);
+        if (!customer) {
+          return res.status(400).json({
+            success: false,
+            message: `Customer with id ${customers[i]} does not exist`,
+          });
+        }
+
+        const route = await Route.findOne({ customers: customers[i] });
+        if (route) {
+          return res.status(400).json({
+            success: false,
+            message: `${customer.businessname} is already assigned to route ${route.name}`,
+          });
+        }
+      }
+    }
+
     const savedRoute = await newRoute.save();
+
+    for (let i = 0; i < customers.length; i++) {
+      await Customer.findByIdAndUpdate(customers[i], {
+        $set: { routeId: savedRoute._id },
+      });
+    }
+
     res.status(200).json(savedRoute);
   } catch (err) {
     await log(err);
@@ -21,6 +50,30 @@ exports.createRoute = async (req, res) => {
 };
 exports.updateRoute = async (req, res) => {
   try {
+    const { customers } = req.body;
+    if (customers) {
+      for (let i = 0; i < customers.length; i++) {
+        const customer = await Customer.findById(customers[i]);
+        if (!customer) {
+          return res.status(400).json({
+            success: false,
+            message: `Customer with id ${customers[i]} does not exist`,
+          });
+        }
+
+        const route = await Route.findOne({
+          customers: customers[i],
+          _id: { $ne: req.params.id },
+        });
+        if (route) {
+          return res.status(400).json({
+            success: false,
+            message: `${customer.businessname} is already assigned to route ${route.name}`,
+          });
+        }
+      }
+    }
+
     const updatedRoute = await Route.findByIdAndUpdate(
       req.params.id,
       {
@@ -29,6 +82,11 @@ exports.updateRoute = async (req, res) => {
       { new: true }
     );
     if (updatedRoute) {
+      for (let i = 0; i < customers.length; i++) {
+        await Customer.findByIdAndUpdate(customers[i], {
+          $set: { routeId: updatedRoute._id },
+        });
+      }
       res.status(200).json(updatedRoute);
     } else {
       res.status(404).json("No route was found with this id !");
@@ -57,7 +115,7 @@ exports.deleteRoute = async (req, res) => {
 };
 exports.getRouteRoute = async (req, res) => {
   try {
-    const route = await Route.findById(req.params.id);
+    const route = await Route.findById(req.params.id).populate("customers");
     if (route) {
       res.status(200).json(route);
     } else {
@@ -68,7 +126,7 @@ exports.getRouteRoute = async (req, res) => {
     res.status(500).json(err);
   }
 };
-exports.getAllRoutes = async (req, res) => {
+exports.getAllRoutes = async (_req, res) => {
   try {
     const routes = await Route.find().sort({ _id: -1 });
     const routeCount = await Route.countDocuments();

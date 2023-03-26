@@ -3,6 +3,7 @@ const Vehicle = require("../models/Vehicle");
 const Run = require("../models/Run");
 const Order = require("../models/Orders");
 const Sharedrecords = require("../models/Sharedrecords");
+const Route = require("../models/Route");
 const { log } = require("../helpers/Loger");
 const moment = require("moment");
 
@@ -44,6 +45,9 @@ exports.createCostumer = async (req, res) => {
 
   try {
     const savedCustomer = await newCustomer.save();
+    await Route.findByIdAndUpdate(newCustomer.routeId, {
+      $push: { customers: savedCustomer._id },
+    });
     await XeroHelper.synchCustomerToXero(savedCustomer);
     res.status(200).json(savedCustomer);
     await Sharedrecords.findByIdAndUpdate(
@@ -72,6 +76,16 @@ exports.updateCostumer = async (req, res) => {
       { new: true }
     );
     if (updatedCustomer) {
+      const route = await Route.findOne({ customers: req.params.id });
+      if (route._id.toString() !== updatedCustomer.routeId.toString()) {
+        await Route.findByIdAndUpdate(route._id, {
+          $pull: { customers: req.params.id },
+        });
+        await Route.findByIdAndUpdate(updatedCustomer.routeId, {
+          $push: { customers: req.params.id },
+        });
+      }
+
       await XeroHelper.synchCustomerToXero(updatedCustomer);
       res.status(200).json(updatedCustomer);
     } else {
@@ -264,6 +278,72 @@ exports.getTopCustomers = async (req, res) => {
     });
   } catch (err) {
     console.log("getTopCustomers err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.getCustomersToCall = async (req, res) => {
+  try {
+    const tomorrow = moment().add(1, "days").format("dddd").toLowerCase();
+
+    const customers = await Customer.find({
+      preferredday: tomorrow,
+      isarchived: false,
+      "deliveryoccur.number": { $ne: 0 },
+      $or: [
+        { sheduledCall: { $exists: false } },
+        {
+          "sheduledCall.date": {
+            $lte: moment().endOf("day").toDate(),
+            $gte: moment().startOf("day").toDate(),
+          },
+        },
+        {
+          "sheduledCall.date": {
+            $lte: moment().subtract(1, "weeks").endOf("day").toDate(),
+            $gte: moment().subtract(1, "weeks").startOf("day").toDate(),
+          },
+          "deliveryoccur.number": 1,
+        },
+        {
+          "sheduledCall.date": {
+            $lte: moment().subtract(2, "weeks").endOf("day").toDate(),
+            $gte: moment().subtract(2, "weeks").startOf("day").toDate(),
+          },
+          "deliveryoccur.number": 2,
+        },
+      ],
+    });
+
+    for (let customer of customers) {
+      customer.sheduledCall = {
+        date: moment().toDate(),
+        isCalled: customer.sheduledCall?.isCalled || false,
+      };
+      await customer.save();
+    }
+
+    res.status(200).json(customers);
+  } catch (err) {
+    console.log("getCustomersToCall err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.toggleCall = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customer = await Customer.findById(id);
+    if (!customer) return res.status(404).json("customer not found");
+
+    customer.sheduledCall.isCalled = !customer.sheduledCall.isCalled;
+    await customer.save();
+
+    res.status(200).json(customer);
+  } catch (err) {
+    console.log("markAsCalled err", err);
     await log(err);
     res.status(500).json(err);
   }
