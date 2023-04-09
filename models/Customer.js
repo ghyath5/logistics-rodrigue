@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const CustomerSchema = new mongoose.Schema(
   {
     codeid: { type: String, required: true },
+    xeroid: { type: String, unique: true },
     businessname: { type: String, required: true },
     address: { type: String },
     city: { type: String },

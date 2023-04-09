@@ -15,7 +15,7 @@ const XeroHelper = require("../helpers/Xero");
 // 63bfdda23c0361cc932597da
 
 exports.createCostumer = async (req, res) => {
-  const { businessname, email } = req.body;
+  const { businessname, email, abn } = req.body;
   const newCustomer = new Customer(req.body);
   const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.customercodeid;
@@ -35,6 +35,13 @@ exports.createCostumer = async (req, res) => {
     });
   }
 
+  const abnUser = await Customer.findOne({ abn });
+  if (abnUser) {
+    return res.status(400).json({
+      success: false,
+      message: "This ABN is already in use, please choose a different one",
+    });
+  }
   // const emailUser = await Customer.findOne({ email });
   // if (emailUser) {
   //   return res.status(400).json({
@@ -45,6 +52,7 @@ exports.createCostumer = async (req, res) => {
 
   try {
     const savedCustomer = await newCustomer.save();
+    console.log("savedCustomer", savedCustomer);
     await Route.findByIdAndUpdate(newCustomer.routeId, {
       $push: { customers: savedCustomer._id },
     });
@@ -59,15 +67,41 @@ exports.createCostumer = async (req, res) => {
     );
   } catch (err) {
     console.log("err", err);
-    await log(err);
+    // await log(err);
     res.status(500).json(err);
   }
 };
 exports.updateCostumer = async (req, res) => {
-  const { promotions } = req.body;
+  const { promotions, businessname, abn } = req.body;
   try {
     if (promotions) {
     }
+
+    const existsBusinessName = await Customer.findOne({
+      businessname,
+      _id: { $ne: req.params.id },
+    });
+
+    if (existsBusinessName) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This businessname is already in use, please choose a different one",
+      });
+    }
+
+    const existsAbn = await Customer.findOne({
+      abn,
+      _id: { $ne: req.params.id },
+    });
+
+    if (existsAbn) {
+      return res.status(400).json({
+        success: false,
+        message: "This ABN is already in use, please choose a different one",
+      });
+    }
+
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       {

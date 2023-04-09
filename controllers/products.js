@@ -6,10 +6,12 @@ const Category = require("../models/Category");
 
 const { default: mongoose } = require("mongoose");
 
-exports.createproduct = async (req, res) => {
-  const { name, categoryId, assignedCode } = req.body;
+const XeroHelper = require("../helpers/Xero");
 
-  if (!name || !categoryId) {
+exports.createproduct = async (req, res) => {
+  const { name, assignedCode } = req.body;
+
+  if (!name || !assignedCode) {
     return res.status(400).json("Please fill in all the fields");
   } else {
     const newProduct = new Products(req.body);
@@ -38,6 +40,7 @@ exports.createproduct = async (req, res) => {
         }
         newProduct.generatedCode = codeid;
         let savedProduct = await newProduct.save();
+        await XeroHelper.synchProductToXero(savedProduct);
         res.status(200).json(savedProduct);
         await Sharedrecords.findByIdAndUpdate("63663fa59b531a420083d78f", {
           $inc: { productcodeid: 1 },
@@ -60,6 +63,7 @@ exports.updateProduct = async (req, res) => {
       { new: true }
     );
     if (updatedProduct) {
+      await XeroHelper.synchProductToXero(updatedProduct);
       res.status(200).json(updatedProduct);
     } else {
       res.status(404).json("No product was found with this id !");
