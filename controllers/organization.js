@@ -4,7 +4,7 @@ const { log } = require("../helpers/Loger");
 
 exports.createOrganization = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, head, customers } = req.body;
     const newOrganization = new Organization(req.body);
 
     const isNewOrganizationName = await Organization.findOne({ name });
@@ -13,6 +13,22 @@ exports.createOrganization = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "This organization name is already in use",
+      });
+
+    if (!head)
+      return res.status(400).json({
+        success: false,
+        message: "You must provide a head for this organization",
+      });
+
+    const headIsCustomer = customers.find(
+      (customer) => customer.toString() === head.toString()
+    );
+
+    if (!headIsCustomer)
+      return res.status(400).json({
+        success: false,
+        message: "The head must be a customer in this organization",
       });
 
     const savedOrganization = await newOrganization.save();
@@ -61,6 +77,35 @@ exports.addCustomerToOrganization = async (req, res) => {
 };
 exports.updateOrganization = async (req, res) => {
   try {
+    const { name, head, customers } = req.body;
+
+    const nameExists = await Organization.findOne({
+      name,
+      _id: { $ne: req.params.id },
+    });
+
+    if (nameExists)
+      return res.status(400).json({
+        success: false,
+        message: "This organization name is already in use",
+      });
+
+    if (!head)
+      return res.status(400).json({
+        success: false,
+        message: "You must provide a head for this organization",
+      });
+
+    const headIsCustomer = customers.find(
+      (customer) => customer.toString() === head.toString()
+    );
+
+    if (!headIsCustomer)
+      return res.status(400).json({
+        success: false,
+        message: "The head must be a customer in this organization",
+      });
+
     const updatedOrganization = await Organization.findByIdAndUpdate(
       req.params.id,
       {
