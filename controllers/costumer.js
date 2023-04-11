@@ -322,7 +322,7 @@ exports.getCustomersToCall = async (req, res) => {
     const { routeId } = req.query;
 
     const filters = {};
-    if (routeId) filters.route = routeId;
+    if (routeId) filters.routeId = routeId;
 
     const tomorrow = moment().add(1, "days").format("dddd").toLowerCase();
 
