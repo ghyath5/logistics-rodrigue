@@ -107,7 +107,7 @@ exports.deleteOrganization = async (req, res) => {
 exports.getOrganization = async (req, res) => {
   try {
     const organization = await Organization.findById(req.params.id).populate(
-      "customers"
+      "customers head"
     );
     if (organization) {
       res.status(200).json(organization);
@@ -123,7 +123,7 @@ exports.getAllOrganizations = async (req, res) => {
   try {
     const organizations = await Organization.find()
       .sort({ _id: -1 })
-      .populate("customers");
+      .populate("customers head");
     const organizationCount = await Organization.countDocuments();
     let objectTosend = {
       organizationCount,

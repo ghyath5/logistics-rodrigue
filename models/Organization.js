@@ -11,6 +11,10 @@ const OrganizationSchema = new mongoose.Schema(
         },
       },
     ],
+    head: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customer",
+    },
   },
   { timestamps: true }
 );
