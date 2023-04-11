@@ -319,12 +319,18 @@ exports.getTopCustomers = async (req, res) => {
 
 exports.getCustomersToCall = async (req, res) => {
   try {
+    const { routeId } = req.query;
+
+    const filters = {};
+    if (routeId) filters.route = routeId;
+
     const tomorrow = moment().add(1, "days").format("dddd").toLowerCase();
 
     const customers = await Customer.find({
       preferredday: tomorrow,
       isarchived: false,
       "deliveryoccur.number": { $ne: 0 },
+      ...filters,
       $or: [
         { sheduledCall: { $exists: false } },
         {
