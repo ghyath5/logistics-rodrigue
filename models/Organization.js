@@ -11,6 +11,7 @@ const OrganizationSchema = new mongoose.Schema(
         },
       },
     ],
+    // head of customers
   },
   { timestamps: true }
 );

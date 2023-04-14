@@ -53,16 +53,16 @@ exports.updateRoute = async (req, res) => {
     const { customers } = req.body;
     if (customers) {
       for (let i = 0; i < customers.length; i++) {
-        const customer = await Customer.findById(customers[i]);
+        const customer = await Customer.findById(customers[i].customer);
         if (!customer) {
           return res.status(400).json({
             success: false,
-            message: `Customer with id ${customers[i]} does not exist`,
+            message: `Customer with id ${customers[i].customer} does not exist`,
           });
         }
 
         const route = await Route.findOne({
-          customers: customers[i],
+          customers: customers[i].customer,
           _id: { $ne: req.params.id },
         });
         if (route) {
@@ -83,7 +83,7 @@ exports.updateRoute = async (req, res) => {
     );
     if (updatedRoute) {
       for (let i = 0; i < customers.length; i++) {
-        await Customer.findByIdAndUpdate(customers[i], {
+        await Customer.findByIdAndUpdate(customers[i].customer, {
           $set: { routeId: updatedRoute._id },
         });
       }
@@ -93,6 +93,7 @@ exports.updateRoute = async (req, res) => {
     }
   } catch (err) {
     await log(err);
+    console.log("updateRoute err", err);
     res.status(500).json(err);
   }
 };
