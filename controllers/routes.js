@@ -1,6 +1,7 @@
 const Route = require("../models/Route");
 const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
+const mongoose = require("mongoose");
 
 exports.createRoute = async (req, res) => {
   const { name } = req.body;
@@ -53,16 +54,15 @@ exports.updateRoute = async (req, res) => {
     const { customers } = req.body;
     if (customers) {
       for (let i = 0; i < customers.length; i++) {
-        const customer = await Customer.findById(customers[i].customer);
+        const customer = await Customer.findById(customers[i]);
         if (!customer) {
           return res.status(400).json({
             success: false,
-            message: `Customer with id ${customers[i].customer} does not exist`,
+            message: `Customer with id ${customers[i]} does not exist`,
           });
         }
-
         const route = await Route.findOne({
-          customers: customers[i].customer,
+          customers: customers[i],
           _id: { $ne: req.params.id },
         });
         if (route) {
@@ -81,9 +81,11 @@ exports.updateRoute = async (req, res) => {
       },
       { new: true }
     );
+
     if (updatedRoute) {
       for (let i = 0; i < customers.length; i++) {
-        await Customer.findByIdAndUpdate(customers[i].customer, {
+        console.log("customers[i].customer", customers[i]);
+        await Customer.findByIdAndUpdate(customers[i], {
           $set: { routeId: updatedRoute._id },
         });
       }
