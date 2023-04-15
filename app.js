@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 
 // https://monjay.app.qore.com.au
 //
+//
 // admin@mjmezza.com.au
 // Holden15
 
@@ -37,7 +38,6 @@ const {
   statisticsRoute,
   driversRoute,
   webhookRoute,
-  accountRoute,
 } = require("./routes");
 
 dotenv.config();
@@ -79,7 +79,6 @@ app.use("/api/people", peopleRoute);
 app.use("/api/organization", organizationRoute);
 app.use("/api/statistics", statisticsRoute);
 app.use("/api/webhook", webhookRoute);
-app.use("/api/account", accountRoute);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT || 5000}`);
@@ -103,9 +102,3 @@ const xeroHelper = require("./helpers/Xero");
 // title above all charts : products and sales analysis
 // add notes to order creation
 // top selling product
-
-//======================================
-//============================
-//============================
-//======================================
-// when creating an order it is being saved in Xero too

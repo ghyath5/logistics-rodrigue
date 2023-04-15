@@ -1,6 +1,7 @@
 const Route = require("../models/Route");
 const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
+const mongoose = require("mongoose");
 
 exports.createRoute = async (req, res) => {
   const { name } = req.body;
@@ -60,7 +61,6 @@ exports.updateRoute = async (req, res) => {
             message: `Customer with id ${customers[i]} does not exist`,
           });
         }
-
         const route = await Route.findOne({
           customers: customers[i],
           _id: { $ne: req.params.id },
@@ -81,8 +81,10 @@ exports.updateRoute = async (req, res) => {
       },
       { new: true }
     );
+
     if (updatedRoute) {
       for (let i = 0; i < customers.length; i++) {
+        console.log("customers[i].customer", customers[i]);
         await Customer.findByIdAndUpdate(customers[i], {
           $set: { routeId: updatedRoute._id },
         });
@@ -93,6 +95,7 @@ exports.updateRoute = async (req, res) => {
     }
   } catch (err) {
     await log(err);
+    console.log("updateRoute err", err);
     res.status(500).json(err);
   }
 };
