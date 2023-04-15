@@ -15,6 +15,11 @@ const ProductSchema = new mongoose.Schema(
     unitesperbox: { type: Number, required: true },
     prioritynumber: { type: Number, default: 0 },
     visibility: { type: Boolean, default: true },
+    isarchived: { type: Boolean, default: false },
+    taxType: {
+      type: String,
+      enum: ["OUTPUT", "EXEMPTOUTPUT", "EXEMPTEXPENSES"],
+    },
   },
   { timestamps: true }
 );

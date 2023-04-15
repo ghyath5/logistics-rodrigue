@@ -11,6 +11,11 @@ const OrganizationSchema = new mongoose.Schema(
         },
       },
     ],
+    head: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customer",
+      required: true,
+    },
     // head of customers
   },
   { timestamps: true }

@@ -16,9 +16,16 @@ exports.testWebhook = async (req, res) => {
       console.log("Signature passed! This is from Xero!");
       const body = JSON.parse(req.body.toString());
       for (let event of body.events) {
-        if (event.eventCategory === "CONTACT") {
-          const contactId = event.resourceId;
-          await xeroHelper.synchCustomerFromXero(contactId);
+        const resourceId = event.resourceId;
+        switch (event.eventCategory) {
+          case "CONTACT":
+            await xeroHelper.synchCustomerFromXero(resourceId);
+            break;
+          case "ITEM":
+            await xeroHelper.synchProductFromXero(resourceId);
+            break;
+          default:
+            break;
         }
       }
 
