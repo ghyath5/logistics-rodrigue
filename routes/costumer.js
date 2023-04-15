@@ -9,6 +9,7 @@ const {
   getTopCustomers,
   getCustomersToCall,
   toggleCall,
+  getAllNonOrganizationalCustomers,
 } = require("../controllers/costumer");
 const {
   validateCreateCustomer,
@@ -34,5 +35,7 @@ router
   .put(verifyTokenAndAdmin, validateMongoId, validate, updateCostumer)
   .delete(verifyTokenAndAdmin, validateMongoId, validate, deleteCostumer)
   .get(validateMongoId, validate, getCostumer);
+
+router.route("/getnonorgacustomers").post(getAllNonOrganizationalCustomers);
 
 module.exports = router;
