@@ -36,6 +36,7 @@ const CustomerSchema = new mongoose.Schema(
     organization: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Organization",
+      default: null,
     },
     promotions: [
       {

@@ -22,7 +22,7 @@ exports.createOrganization = async (req, res) => {
       });
 
     const headIsCustomer = customers.find(
-      (customer) => customer.toString() === head.toString()
+      (customer) => customer.customerId.toString() === head.toString()
     );
 
     if (!headIsCustomer)
@@ -97,7 +97,7 @@ exports.updateOrganization = async (req, res) => {
       });
 
     const headIsCustomer = customers.find(
-      (customer) => customer.toString() === head.toString()
+      (customer) => customer.customerId.toString() === head.toString()
     );
 
     if (!headIsCustomer)
@@ -151,9 +151,16 @@ exports.deleteOrganization = async (req, res) => {
 };
 exports.getOrganization = async (req, res) => {
   try {
-    const organization = await Organization.findById(req.params.id).populate(
-      "customers head"
-    );
+    const organization = await Organization.findById(req.params.id)
+      .populate({
+        path: "customers",
+        populate: {
+          path: "customerId",
+        },
+      })
+      .populate("head")
+      .exec();
+
     if (organization) {
       res.status(200).json(organization);
     } else {

@@ -150,6 +150,8 @@ exports.deleteCostumer = async (req, res) => {
   }
 };
 exports.getCostumer = async (req, res) => {
+  console.log("22222");
+
   try {
     const customer = await Customer.findById(req.params.id).populate(
       "promotions",
@@ -180,14 +182,16 @@ exports.getCostumerInternally = async (customerId) => {
 exports.getCostumerPaginatedArchived = async (req, res) => {
   try {
     const customerCount = await Customer.countDocuments();
-    const { page, limit, isarchived } = req.query;
+    const { page, limit, isarchived, organization } = req.query;
     if (!page || !limit || !isarchived)
       return res
         .status(400)
         .json(
           "the required query parameters are : page and limit and isarchived"
         );
-    let customers = await Customer.find({ isarchived: isarchived })
+    let customers = await Customer.find({
+      isarchived: isarchived,
+    })
       .populate("paymentmethod")
       .sort("businessname")
       .limit(limit * 1)
@@ -316,7 +320,6 @@ exports.getTopCustomers = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getCustomersToCall = async (req, res) => {
   try {
     const { routeId } = req.query;
@@ -371,7 +374,6 @@ exports.getCustomersToCall = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.toggleCall = async (req, res) => {
   try {
     const { id } = req.params;
@@ -384,6 +386,40 @@ exports.toggleCall = async (req, res) => {
     res.status(200).json(customer);
   } catch (err) {
     console.log("markAsCalled err", err);
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+exports.getAllNonOrganizationalCustomers = async (req, res) => {
+  console.log("1111");
+  try {
+    const { page, limit, find } = req.query;
+    if (!page || !limit || !find)
+      return res
+        .status(400)
+        .json("the required query parameters are : page and limit and find");
+
+    const customers = await Customer.find({
+      $and: [
+        {
+          $or: [
+            { businessname: { $regex: find, $options: "i" } },
+            { firstname: { $regex: find, $options: "i" } },
+            { abn: { $regex: find, $options: "i" } },
+          ],
+        },
+        { organization: null },
+      ],
+    })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    if (customers) {
+      res.status(200).json(customers);
+    } else {
+      return res.status(200).json("No customers found");
+    }
+  } catch (err) {
     await log(err);
     res.status(500).json(err);
   }
