@@ -2,6 +2,8 @@ const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
 const Orders = require("../models/Orders");
 
+const Xero = require("../helpers/Xero");
+
 exports.createRun = async (req, res) => {
   const newRun = new Run(req.body);
   try {
@@ -23,7 +25,7 @@ exports.updateRun = async (req, res) => {
     ).populate("orders");
 
     const ordersIds = updatedRun.orders.map((order) => order._id?.toString());
-    
+
     if (updatedRun.status >= 2) {
       await Orders.updateMany(
         {
@@ -125,6 +127,37 @@ exports.getAllRuns = async (req, res) => {
       return res.status(200).json("No runs found");
     }
   } catch (err) {
+    await log(err);
+    res.status(500).json(err);
+  }
+};
+
+exports.getRunPdf = async (req, res) => {
+  try {
+    const run = await Run.findById(req.params.id)
+      .populate({
+        path: "orders",
+        populate: "customer products.product",
+      })
+      .populate("driver")
+      .populate("vehicle");
+
+    let pdfs = [];
+    for (let i = 0; i < run.orders.length; i++) {
+      const orderId = run.orders[i]._id;
+      const buffer = await Xero.getInvoiceAsPdf(orderId);
+      pdfs.push(buffer);
+    }
+
+    if (run) {
+      res.status(200).json({
+        run,
+        pdfs,
+      });
+    } else {
+      res.status(404).json("No run was found with this id !");
+    }
+  } catch {
     await log(err);
     res.status(500).json(err);
   }
