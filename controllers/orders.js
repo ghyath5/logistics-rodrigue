@@ -156,7 +156,8 @@ exports.createOrder = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Customer not found" });
-    let customerRouteId = ourCustomer.routeId.toString();
+    console.log("ourCustomer", ourCustomer);
+    let customerRouteId = ourCustomer.region.toString();
     const comingRunsArray = await getComingRuns(customerRouteId);
     let orderDate = moment(date).format("L");
 
