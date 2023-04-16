@@ -41,6 +41,10 @@ const OrderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isBackOrder: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
