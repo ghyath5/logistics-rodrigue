@@ -3,6 +3,8 @@ const { XeroClient } = require("xero-node");
 const Customer = require("../models/Customer");
 const Sharedrecords = require("../models/Sharedrecords");
 const Product = require("../models/Products");
+const Order = require("../models/Orders");
+const Organization = require("../models/Organization");
 
 require("dotenv").config();
 
@@ -242,6 +244,115 @@ const synchProductFromXero = async (productId) => {
   }
 };
 
+const createInvoice = async (orderId) => {
+  const order = await Order.findById(orderId)
+    .populate(" customer products.product")
+    .exec();
+
+  const customer = await Customer.findById(order.customer);
+  const xeroId = order.invoiceid ? order.invoiceid : "";
+
+  await xero.getClientCredentialsToken();
+
+  const invoices = xeroId
+    ? await xero.accountingApi.getInvoice("", xeroId)
+    : { body: { invoices: [] } };
+
+  let head = null;
+  if (customer && customer.organization) {
+    const org = await Organization.findById(customer.organization).populate(
+      "head"
+    );
+    head = org.head.xeroid;
+  }
+
+  const addUpdateFields = {
+    type: "ACCREC",
+    contact: {
+      contactID: head ? head : customer.xeroid,
+    },
+    date: order.date,
+    dueDate: order.date,
+    lineItems: order.products.map((product) => {
+      return {
+        description: product.product.name,
+        quantity: product.quantity,
+        unitAmount: product.pricePerUnit,
+        accountCode: "200",
+        itemCode: product.product.assignedCode,
+        taxType: product.product.taxType,
+      };
+    }),
+    reference: order._id.toString(),
+  };
+
+  if (invoices.body.invoices.length === 0) {
+    const res = await xero.accountingApi.createInvoices(
+      "",
+      {
+        invoices: [addUpdateFields],
+      },
+      summarizeErrors
+    );
+
+    await Order.findByIdAndUpdate(order._id, {
+      invoiceid: res.body.invoices[0].invoiceID,
+    });
+
+    console.log("Xero Invoice created successfully");
+    return res.body.invoices[0].invoiceID;
+  } else {
+    const res = await xero.accountingApi.updateInvoice(
+      "",
+      invoices.body.invoices[0].invoiceID,
+      {
+        invoices: [addUpdateFields],
+      },
+      summarizeErrors
+    );
+    console.log("Xero Invoice updated successfully");
+    return res.body.invoices[0].invoiceID;
+  }
+};
+
+const getInvoiceAsPdf = async (orderId) => {
+  await xero.getClientCredentialsToken();
+
+  const order = await Order.findByIdAndUpdate(orderId);
+
+  let invoiceId = order.invoiceid;
+  if (!invoiceId) {
+    invoiceId = await createInvoice(orderId);
+  }
+
+  const res = await xero.accountingApi.getInvoiceAsPdf("", invoiceId, {
+    headers: {
+      Accept: "application/pdf",
+    },
+  });
+  return res.body;
+};
+
+// test it on order 64004a69d6674efa61fe471a
+
+// createInvoice("64004a69d6674efa61fe471a")
+//   .then((res) => {
+//     console.log(res);
+//   })
+//   .catch((err) => {
+//     console.log(err.response.body.Elements[0].ValidationErrors);
+//   });
+
+// getInvoiceAsPdf("c4e53bcf-a2ae-47e2-8e2a-005636057e1d")
+//   .then((res) => {
+//     const fs = require("fs");
+//     const buffer = Buffer.from(res);
+//     fs.writeFileSync("invoice.pdf", buffer);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
 module.exports = {
   createCustomers,
   getCustomer,
@@ -249,4 +360,6 @@ module.exports = {
   synchCustomerFromXero,
   synchProductToXero,
   synchProductFromXero,
+  createInvoice,
+  getInvoiceAsPdf,
 };

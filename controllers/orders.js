@@ -12,6 +12,8 @@ const Orders = require("../models/Orders");
 const xl = require("excel4node");
 const { get, isFunction, stubTrue } = require("lodash");
 
+const Xero = require("../helpers/Xero");
+
 exports.sendCustomeIdToCreateOrder = async (req, res) => {
   try {
     const find = req.query?.find || "";
@@ -156,7 +158,6 @@ exports.createOrder = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Customer not found" });
-    console.log("ourCustomer", ourCustomer);
     let customerRouteId = ourCustomer.region.toString();
     const comingRunsArray = await getComingRuns(customerRouteId);
     let orderDate = moment(date).format("L");
@@ -284,52 +285,40 @@ exports.getOrdersByDate = async (req, res) => {
   }
 };
 exports.getAllOrders = async (req, res) => {
-  const { limit, page, done } = req.query;
+  const { limit, page, done, backOrder } = req.query;
   //all 0 1 2 3
   // done = true => 2
   // done = false => 0 1 2 3
   try {
-    const orders =
+    const statusFilters =
       done === "all"
-        ? await Order.find()
-            .populate("customer")
-            .populate({
-              path: "products",
-              populate: {
-                path: "product",
-                model: "Product",
-              },
-            })
-            .sort({ date: 1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
+        ? {}
         : done === "false"
-        ? await Order.find({
-            $or: [{ status: 0 }, { status: 1 }, { status: 3 }],
-          })
-            .populate("customer")
-            .populate({
-              path: "products",
-              populate: {
-                path: "product",
-                model: "Product",
-              },
-            })
-            .sort({ date: 1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-        : await Order.find({ status: 2 })
-            .populate("customer")
-            .populate({
-              path: "products",
-              populate: {
-                path: "product",
-                model: "Product",
-              },
-            })
-            .sort({ date: 1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit);
+        ? { $or: [{ status: 0 }, { status: 1 }, { status: 3 }] }
+        : { status: 2 };
+
+    const backOrderFilters =
+      backOrder === "true"
+        ? { isBackOrder: true }
+        : backOrder === "false"
+        ? { isBackOrder: false }
+        : {};
+
+    const orders = await Order.find({
+      ...statusFilters,
+      ...backOrderFilters,
+    })
+      .populate("customer")
+      .populate({
+        path: "products",
+        populate: {
+          path: "product",
+          model: "Product",
+        },
+      })
+      .sort({ date: 1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
 
     const orderCount = await Order.countDocuments();
     let objectTosend = {

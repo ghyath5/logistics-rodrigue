@@ -6,6 +6,7 @@ const OrderSchema = new mongoose.Schema(
   // status 2: done
   // status 3: canceled
   {
+    invoiceid: { type: String },
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
@@ -34,11 +35,15 @@ const OrderSchema = new mongoose.Schema(
     status: { type: Number, default: 0 },
     automaticallyGenerated: {
       type: Boolean,
-      default: false
+      default: false,
     },
     deliveryOccured: {
       type: Boolean,
-      default: false
+      default: false,
+    },
+    isBackOrder: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
