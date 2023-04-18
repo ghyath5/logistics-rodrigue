@@ -53,6 +53,11 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Email is missing"),
+  check("firstname")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("First Name name is required"),
   check("lastname")
     .trim()
     .not()
