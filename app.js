@@ -38,6 +38,7 @@ const {
   statisticsRoute,
   driversRoute,
   webhookRoute,
+  accountRoute,
 } = require("./routes");
 
 dotenv.config();
@@ -79,6 +80,7 @@ app.use("/api/people", peopleRoute);
 app.use("/api/organization", organizationRoute);
 app.use("/api/statistics", statisticsRoute);
 app.use("/api/webhook", webhookRoute);
+app.use("/api/account", accountRoute);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT || 5000}`);
