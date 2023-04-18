@@ -36,7 +36,7 @@ exports.getAccount = async (req, res) => {
   try {
     const { id } = req.user;
 
-    const user = User.findById(id);
+    const user = await User.findById(id);
 
     if (!user) return res.status(404).json("Account not found");
 
