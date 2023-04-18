@@ -22,7 +22,7 @@ exports.createOrganization = async (req, res) => {
       });
 
     const headIsCustomer = customers.find(
-      (customer) => customer.customerId.toString() === head.toString()
+      (customer) => customer.toString() === head.toString()
     );
 
     if (!headIsCustomer)
@@ -57,10 +57,9 @@ exports.addCustomerToOrganization = async (req, res) => {
         message: `Customer by the id of ${customerId} already has a an organization`,
       });
     }
-    let customerToPush = { customer: customerId };
     const organization = await Organization.findByIdAndUpdate(
       req.params.id,
-      { $push: { customers: customerToPush } },
+      { $push: { customers: customerId } },
       { new: true }
     );
     if (organization) {
@@ -97,7 +96,7 @@ exports.updateOrganization = async (req, res) => {
       });
 
     const headIsCustomer = customers.find(
-      (customer) => customer.customerId.toString() === head.toString()
+      (customer) => customer.toString() === head.toString()
     );
 
     if (!headIsCustomer)
@@ -154,9 +153,6 @@ exports.getOrganization = async (req, res) => {
     const organization = await Organization.findById(req.params.id)
       .populate({
         path: "customers",
-        populate: {
-          path: "customerId",
-        },
       })
       .populate("head")
       .exec();
