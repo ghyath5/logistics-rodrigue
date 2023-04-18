@@ -158,30 +158,43 @@ exports.createOrder = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Customer not found" });
-    let customerRouteId = ourCustomer.region.toString();
-    const comingRunsArray = await getComingRuns(customerRouteId);
-    let orderDate = moment(date).format("L");
 
-    const existComingRun = comingRunsArray.find((oneComingRun) => {
-      let formattedRunDate = moment(oneComingRun.date).format("L");
-      let runRouteId = oneComingRun.route.toString();
-      return formattedRunDate == orderDate && runRouteId == customerRouteId;
-    });
-
-    if (existComingRun) {
-      let runId = existComingRun._id.toString();
-      const ourRun = await Run.findByIdAndUpdate(
-        runId,
-        { $push: { orders: newOrder } },
-        { new: true }
+    if (newOrder.isBackOrder) {
+      const pdf = await Xero.getInvoiceAsPdf(newOrder._id);
+      const order = await Order.findById(newOrder._id).populate(
+        "customer products.product"
       );
       return res.status(200).json({
-        message: "Order is added to already created run at that date",
-        ourRun,
+        message: "Order created successfully",
+        order,
+        pdf,
       });
+    } else {
+      let customerRouteId = ourCustomer.routeId.toString();
+      const comingRunsArray = await getComingRuns(customerRouteId);
+      let orderDate = moment(date).format("L");
+
+      const existComingRun = comingRunsArray.find((oneComingRun) => {
+        let formattedRunDate = moment(oneComingRun.date).format("L");
+        let runRouteId = oneComingRun.route.toString();
+        return formattedRunDate == orderDate && runRouteId == customerRouteId;
+      });
+
+      if (existComingRun) {
+        let runId = existComingRun._id.toString();
+        const ourRun = await Run.findByIdAndUpdate(
+          runId,
+          { $push: { orders: newOrder } },
+          { new: true }
+        );
+        return res.status(200).json({
+          message: "Order is added to already created run at that date",
+          ourRun,
+        });
+      }
+      const ourRun = await createNewRun(orderDate, newOrder, customerRouteId);
+      return res.status(200).json({ message: "New run is created", ourRun });
     }
-    const ourRun = await createNewRun(orderDate, newOrder, customerRouteId);
-    return res.status(200).json({ message: "New run is created", ourRun });
   } catch (err) {
     console.log("createOrder err", err);
     await log(err);
