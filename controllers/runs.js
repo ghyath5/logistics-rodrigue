@@ -133,7 +133,13 @@ exports.getAllRuns = async (req, res) => {
 };
 exports.getRunPdf = async (req, res) => {
   try {
-    const run = await Run.findById(req.params.id);
+    const run = await Run.findById(req.params.id)
+      .populate({
+        path: "orders",
+        populate: "customer products.product",
+      })
+      .populate("driver")
+      .populate("vehicle");
 
     let pdfs = [];
     for (let i = 0; i < run.orders.length; i++) {
