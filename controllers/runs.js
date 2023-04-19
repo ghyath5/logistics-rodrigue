@@ -131,16 +131,9 @@ exports.getAllRuns = async (req, res) => {
     res.status(500).json(err);
   }
 };
-
 exports.getRunPdf = async (req, res) => {
   try {
-    const run = await Run.findById(req.params.id)
-      .populate({
-        path: "orders",
-        populate: "customer products.product",
-      })
-      .populate("driver")
-      .populate("vehicle");
+    const run = await Run.findById(req.params.id);
 
     let pdfs = [];
     for (let i = 0; i < run.orders.length; i++) {
@@ -157,8 +150,9 @@ exports.getRunPdf = async (req, res) => {
     } else {
       res.status(404).json("No run was found with this id !");
     }
-  } catch {
+  } catch (err) {
     await log(err);
+    console.log("err", err);
     res.status(500).json(err);
   }
 };

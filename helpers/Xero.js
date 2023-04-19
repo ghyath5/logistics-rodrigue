@@ -246,7 +246,7 @@ const synchProductFromXero = async (productId) => {
 
 const createInvoice = async (orderId) => {
   const order = await Order.findById(orderId)
-    .populate(" customer products.product")
+    .populate("customer products.product")
     .exec();
 
   const customer = await Customer.findById(order.customer);
@@ -260,9 +260,8 @@ const createInvoice = async (orderId) => {
 
   let head = null;
   if (customer && customer.organization) {
-    const org = await Organization.findById(customer.organization).populate(
-      "head"
-    );
+    const org = await Organization.findById(customer.organization);
+    console.log("org", org);
     head = org.head.xeroid;
   }
 
