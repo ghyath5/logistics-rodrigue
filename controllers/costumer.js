@@ -418,7 +418,6 @@ exports.toggleCall = async (req, res) => {
   }
 };
 exports.getAllNonOrganizationalCustomers = async (req, res) => {
-  console.log("1111");
   try {
     const { page, limit, find } = req.query;
     if (!page || !limit || !find)
