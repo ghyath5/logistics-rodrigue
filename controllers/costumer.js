@@ -4,6 +4,7 @@ const Run = require("../models/Run");
 const Order = require("../models/Orders");
 const Sharedrecords = require("../models/Sharedrecords");
 const Route = require("../models/Route");
+const Organization = require("../models/Organization");
 const { log } = require("../helpers/Loger");
 const moment = require("moment");
 
@@ -139,7 +140,33 @@ exports.deleteCostumer = async (req, res) => {
         message: "Cannot delete customer when associated to an order",
       });
 
-    await Customer.findByIdAndDelete(req.params.id);
+    const deleterCustomer = await Customer.findByIdAndDelete(req.params.id);
+
+    if (!deleterCustomer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    if (deleterCustomer.organization) {
+      const organization = await Organization.findById(
+        deleterCustomer.organization
+      );
+      if (organization) {
+        const org = await Organization.findByIdAndUpdate(organization._id, {
+          $pull: { customers: deleterCustomer._id },
+        });
+        if (!org.customers.length) {
+          await Organization.findByIdAndDelete(organization._id);
+        } else if (org.head.toString === deleterCustomer._id.toString) {
+          await Organization.findByIdAndUpdate(organization._id, {
+            $set: { head: org.customers[0] },
+          });
+        }
+      }
+    }
+
     return res.status(200).json({
       success: false,
       message: "Customer has been successfully deleted...",

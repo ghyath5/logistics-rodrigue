@@ -259,9 +259,15 @@ const createInvoice = async (orderId) => {
     : { body: { invoices: [] } };
 
   let head = null;
-  if (customer && customer.organization) {
+
+  if (!customer) {
+    throw new Error("Customer not found");
+  }
+
+  if (customer.organization) {
+    console.log("customer.organization", customer.organization);
     const org = await Organization.findById(customer.organization);
-    console.log("org", org);
+    // console.log("org", org);
     head = org.head.xeroid;
   }
 
@@ -330,6 +336,10 @@ const getInvoiceAsPdf = async (orderId) => {
     },
   });
   return res.body;
+
+  // const pdf =  res.body;
+  // const base64 = Buffer.from(pdf).toString("base64");
+  // return base64;
 };
 
 // test it on order 64004a69d6674efa61fe471a

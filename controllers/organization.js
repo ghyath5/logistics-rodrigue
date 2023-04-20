@@ -31,7 +31,28 @@ exports.createOrganization = async (req, res) => {
         message: "The head must be a customer in this organization",
       });
 
+    for (let i = 0; i < customers.length; i++) {
+      const customer = await Customer.findById(customers[i]);
+      if (!customer)
+        return res.status(404).json({
+          success: false,
+          message: `No customer was found by the id of ${customers[i]}`,
+        });
+      if (customer.organization) {
+        return res.status(399).json({
+          success: false,
+          message: `Customer by the id of ${customers[i]} already has a an organization`,
+        });
+      }
+    }
+
     const savedOrganization = await newOrganization.save();
+
+    await Customer.updateMany(
+      { _id: { $in: customers } },
+      { $set: { organization: savedOrganization._id } }
+    );
+
     res.status(200).json(savedOrganization);
   } catch (err) {
     console.log("createOrganization err", err);
@@ -63,6 +84,9 @@ exports.addCustomerToOrganization = async (req, res) => {
       { new: true }
     );
     if (organization) {
+      await Customer.findByIdAndUpdate(customerId, {
+        $set: { organization: organization._id },
+      });
       return res.status(200).json({ success: true, organization });
     } else {
       return res.status(404).json({
@@ -105,6 +129,18 @@ exports.updateOrganization = async (req, res) => {
         message: "The head must be a customer in this organization",
       });
 
+    for (let i = 0; i < customers.length; i++) {
+      const customer = await Customer.findOne({
+        _id: customers[i],
+        organization: { $ne: req.params.id },
+      });
+      if (customer)
+        return res.status(399).json({
+          success: false,
+          message: `Customer by the id of ${customers[i]} already has a an organization`,
+        });
+    }
+
     const updatedOrganization = await Organization.findByIdAndUpdate(
       req.params.id,
       {
@@ -113,6 +149,10 @@ exports.updateOrganization = async (req, res) => {
       { new: true }
     );
     if (updatedOrganization) {
+      await Customer.updateMany(
+        { _id: { $in: customers } },
+        { $set: { organization: updatedOrganization._id } }
+      );
       res.status(200).json(updatedOrganization);
     } else {
       res.status(404).json("No organization was found with this id !");
