@@ -18,6 +18,7 @@ const ProductSchema = new mongoose.Schema(
     taxType: {
       type: String,
     },
+    xeroid: { type: String },
   },
   { timestamps: true }
 );
