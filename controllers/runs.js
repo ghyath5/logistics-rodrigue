@@ -157,8 +157,8 @@ exports.getRunPdf = async (req, res) => {
       res.status(404).json("No run was found with this id !");
     }
   } catch (err) {
-    await log(err);
-    console.log("err", err);
-    res.status(500).json(err);
+    //await log(err);
+    console.log("err", err.response.body.Elements[0].ValidationErrors);
+    res.status(500).json(err.response.body);
   }
 };
