@@ -8,17 +8,15 @@ const ProductSchema = new mongoose.Schema(
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: true,
     },
     price: { type: Number, required: true },
     promotionPrice: { type: Number },
-    unitesperbox: { type: Number, required: true },
+    unitesperbox: { type: Number },
     prioritynumber: { type: Number, default: 0 },
     visibility: { type: Boolean, default: true },
     isarchived: { type: Boolean, default: false },
     taxType: {
       type: String,
-      enum: ["OUTPUT", "EXEMPTOUTPUT", "EXEMPTEXPENSES"],
     },
   },
   { timestamps: true }

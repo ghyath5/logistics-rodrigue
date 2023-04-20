@@ -151,14 +151,12 @@ const synchCustomerFromXero = async (contactId) => {
 // for when the server is first started
 const synchAllCustomersFromXero = async () => {
   await xero.getClientCredentialsToken();
-  const contacts = await xero.accountingApi.getContacts();
+  const contacts = await xero.accountingApi.getContacts("");
   const contactList = contacts.body.contacts;
 
   for (let i = 0; i < contactList.length; i++) {
     await synchCustomerFromXero(contactList[i].contactID);
   }
-
-  console.log("All customers synched successfully");
 };
 
 const synchProductToXero = async (product) => {
@@ -260,14 +258,12 @@ const synchProductFromXero = async (productId) => {
 // for when the server is first started
 const synchAllProductsFromXero = async () => {
   await xero.getClientCredentialsToken();
-  const items = await xero.accountingApi.getItems();
+  const items = await xero.accountingApi.getItems("");
   const itemList = items.body.items;
 
   for (let i = 0; i < itemList.length; i++) {
     await synchProductFromXero(itemList[i].itemID);
   }
-
-  console.log("All products synched successfully");
 };
 
 const createInvoice = async (orderId) => {
@@ -387,6 +383,14 @@ const getInvoiceAsPdf = async (orderId) => {
 //   .catch((err) => {
 //     console.log(err);
 //   });
+
+synchAllProductsFromXero()
+  .then(() => {
+    console.log("All products synched successfully");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 module.exports = {
   createCustomers,
