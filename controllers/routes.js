@@ -131,7 +131,7 @@ exports.getRouteRoute = async (req, res) => {
 };
 exports.getAllRoutes = async (_req, res) => {
   try {
-    const routes = await Route.find().popuilate("customers").sort({ _id: -1 });
+    const routes = await Route.find().populate("customers").sort({ _id: -1 });
     const routeCount = await Route.countDocuments();
     let objectTosend = {
       routeCount,

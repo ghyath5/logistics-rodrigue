@@ -233,7 +233,7 @@ const synchProductFromXero = async (productId) => {
   if (product) {
     // update product
     await product.updateOne(addUpdateFields);
-    console.log("Product updated successfully");
+    // console.log("Product updated successfully");
   } else {
     // create product
     const codeSequence = await Sharedrecords.findById(
