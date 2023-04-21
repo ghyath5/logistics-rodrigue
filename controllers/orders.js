@@ -107,7 +107,6 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
   }
 };
 exports.createOrder = async (req, res) => {
-  console.clear();
   const createNewRun = async (orderDate, newOrder, customerRouteId) => {
     const newRun = new Run({
       date: orderDate,

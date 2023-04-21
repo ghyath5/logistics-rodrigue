@@ -5,7 +5,6 @@ const dayjs = require("dayjs");
 const moment = require("moment");
 
 exports.getSalesByDay = async (req, res) => {
-  console.clear();
   const { date } = req.query;
   try {
     let yesterday = dayjs(date).subtract(1, "days");
@@ -45,7 +44,6 @@ exports.getOrdersByUserId = async (req, res) => {
   }
 };
 exports.getSalesMonth = async (req, res) => {
-  console.clear();
   const { date } = req.query;
   try {
     let yesterday = dayjs(date).subtract(1, "days");
@@ -125,7 +123,6 @@ exports.getSalesByDateRange = async (req, res) => {
   }
 };
 exports.getSalesPerUser = async (req, res) => {
-  console.clear();
   try {
     const users = await User.find();
     for (let i = 0; i < users.length; i++) {
@@ -136,9 +133,6 @@ exports.getSalesPerUser = async (req, res) => {
           },
         },
       ]);
-      if (data) {
-        console.log(`data ${users[i]._id}`, data);
-      }
     }
   } catch (err) {
     console.log("err", err);

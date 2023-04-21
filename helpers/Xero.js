@@ -40,7 +40,6 @@ const createCustomers = async () => {
 const getCustomer = async (contactId) => {
   await xero.getClientCredentialsToken();
   const contacts = await xero.accountingApi.getContact("", contactId);
-  console.log(contacts.body);
 };
 
 const synchCustomerToXero = async (customer) => {
@@ -84,7 +83,7 @@ const synchCustomerToXero = async (customer) => {
       xeroid: contacts.body.contacts[0].contactID,
     });
 
-    console.log("Xero Contact created successfully");
+    // console.log("Xero Contact created successfully");
   } else {
     await xero.accountingApi.updateContact(
       "",
@@ -93,7 +92,7 @@ const synchCustomerToXero = async (customer) => {
         contacts: [addUpdateFields],
       }
     );
-    console.log("Xero Contact updated successfully");
+    //  console.log("Xero Contact updated successfully");
   }
 };
 
