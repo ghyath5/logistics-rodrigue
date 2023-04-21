@@ -53,7 +53,6 @@ exports.createCostumer = async (req, res) => {
 
   try {
     const savedCustomer = await newCustomer.save();
-    console.log("savedCustomer", savedCustomer);
     await Route.findByIdAndUpdate(newCustomer.routeId, {
       $push: { customers: savedCustomer._id },
     });
@@ -177,8 +176,6 @@ exports.deleteCostumer = async (req, res) => {
   }
 };
 exports.getCostumer = async (req, res) => {
-  console.log("22222");
-
   try {
     const customer = await Customer.findById(req.params.id).populate(
       "promotions",
@@ -294,7 +291,6 @@ exports.getTopCustomers = async (req, res) => {
       { $sort: { totalOrdersAmount: -1 } },
       { $limit: total },
     ]);
-    console.log("topCustomers", topCustomers);
     const names = topCustomers.map((cust) => cust.name);
     const totalOrdersAmount = topCustomers.map(
       (cust) => cust.totalOrdersAmount

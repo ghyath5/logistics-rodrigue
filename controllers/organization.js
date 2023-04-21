@@ -62,7 +62,6 @@ exports.createOrganization = async (req, res) => {
 };
 exports.addCustomerToOrganization = async (req, res) => {
   try {
-    console.clear();
     const { customerId } = req.body;
 
     const customer = await Customer.findById(customerId);

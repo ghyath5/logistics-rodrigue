@@ -7,7 +7,6 @@ const Category = require("../models/Category");
 exports.createpromotion = async (req, res) => {
   const { productspromotion, categorypromotion, from, to } = req.body;
   try {
-    console.clear();
     let now = new Date();
     let fromDate = new Date(from);
     let toDate = new Date(to);

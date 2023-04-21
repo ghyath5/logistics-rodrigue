@@ -84,7 +84,6 @@ exports.updateRoute = async (req, res) => {
 
     if (updatedRoute) {
       for (let i = 0; i < customers.length; i++) {
-        console.log("customers[i].customer", customers[i]);
         await Customer.findByIdAndUpdate(customers[i], {
           $set: { routeId: updatedRoute._id },
         });
