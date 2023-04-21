@@ -102,12 +102,12 @@ exports.updateOrganization = async (req, res) => {
   try {
     const { name, head, customers } = req.body;
 
-    const nameExists = await Organization.findOne({
+    const oldOrg = await Organization.findOne({
       name,
       _id: { $ne: req.params.id },
-    });
+    }).lean();
 
-    if (nameExists)
+    if (oldOrg)
       return res.status(400).json({
         success: false,
         message: "This organization name is already in use",
@@ -153,6 +153,16 @@ exports.updateOrganization = async (req, res) => {
         { _id: { $in: customers } },
         { $set: { organization: updatedOrganization._id } }
       );
+
+      const deletedCustomers = oldOrg.customers.filter(
+        (customer) => !customers.includes(customer.toString())
+      );
+
+      await Customer.updateMany(
+        { _id: { $in: deletedCustomers } },
+        { $set: { organization: null } }
+      );
+
       res.status(200).json(updatedOrganization);
     } else {
       res.status(404).json("No organization was found with this id !");
