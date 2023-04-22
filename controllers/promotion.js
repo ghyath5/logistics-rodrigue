@@ -26,7 +26,7 @@ exports.createpromotion = async (req, res) => {
     }
 
     const newPromotion = new Promotion(req.body);
-
+    console.log("newPromotion", newPromotion);
     let isProductPromotion = productspromotion.length != 0;
     let isCategoryPromotion = Object.keys(categorypromotion).length != 0;
 

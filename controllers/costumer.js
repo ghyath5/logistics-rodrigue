@@ -416,25 +416,34 @@ exports.toggleCall = async (req, res) => {
 exports.getAllNonOrganizationalCustomers = async (req, res) => {
   try {
     const { page, limit, find } = req.query;
-    if (!page || !limit || !find)
+    if (!page || !limit)
       return res
         .status(400)
-        .json("the required query parameters are : page and limit and find");
+        .json(
+          "the required query parameters are page and limit and you can add find"
+        );
+    let customers;
 
-    const customers = await Customer.find({
-      $and: [
-        {
-          $or: [
-            { businessname: { $regex: find, $options: "i" } },
-            { firstname: { $regex: find, $options: "i" } },
-            { abn: { $regex: find, $options: "i" } },
-          ],
-        },
-        { organization: null },
-      ],
-    })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+    if (find) {
+      customers = await Customer.find({
+        $and: [
+          {
+            $or: [
+              { businessname: { $regex: find, $options: "i" } },
+              { firstname: { $regex: find, $options: "i" } },
+              { abn: { $regex: find, $options: "i" } },
+            ],
+          },
+          { organization: null },
+        ],
+      })
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+    } else {
+      customers = await Customer.find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+    }
 
     if (customers) {
       res.status(200).json(customers);

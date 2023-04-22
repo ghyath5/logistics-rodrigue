@@ -9,7 +9,7 @@ const bodyParser = require("body-parser");
 
 // https://monjay.app.qore.com.au
 //
-//
+//      
 // admin@mjmezza.com.au
 // Holden15
 
@@ -52,7 +52,8 @@ const connectWithRetry = () => {
       setTimeout(connectWithRetry, 5000);
     });
 };
-// special wrap ()
+
+// special wrap
 connectWithRetry();
 
 app.use(cors());
