@@ -136,7 +136,15 @@ exports.getRunPdf = async (req, res) => {
     const run = await Run.findById(req.params.id)
       .populate({
         path: "orders",
-        populate: "customer products.product",
+        populate: [
+          {
+            path: "customer",
+            populate: { path: "paymentmethod" },
+          },
+          {
+            path: "products.product",
+          },
+        ],
       })
       .populate("driver")
       .populate("vehicle");
