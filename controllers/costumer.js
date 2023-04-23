@@ -440,7 +440,7 @@ exports.getAllNonOrganizationalCustomers = async (req, res) => {
         .limit(limit * 1)
         .skip((page - 1) * limit);
     } else {
-      customers = await Customer.find()
+      customers = await Customer.find({ organization: null })
         .limit(limit * 1)
         .skip((page - 1) * limit);
     }
