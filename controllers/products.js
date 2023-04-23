@@ -134,8 +134,10 @@ exports.getproductsPaginated = async (req, res) => {
     let productsCount = await Products.countDocuments();
     let hiddenProducts = await Products.countDocuments({ visibility: false });
     let visibleProducts = productsCount - hiddenProducts;
-    const { page = 1, limit = 5 } = req.query;
-    const products = await Products.find()
+    const { page = 1, limit = 5, isArchived } = req.query;
+    const products = await Products.find(
+      isArchived ? { isarchived: true } : { isarchived: false }
+    )
       .populate("categoryId")
       .sort("name")
       .limit(limit * 1)
