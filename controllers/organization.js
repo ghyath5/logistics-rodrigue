@@ -100,12 +100,10 @@ exports.addCustomerToOrganization = async (req, res) => {
 exports.updateOrganization = async (req, res) => {
   try {
     const { name, head, customers } = req.body;
-
     const oldOrg = await Organization.findOne({
       name,
       _id: { $ne: req.params.id },
     }).lean();
-
     if (oldOrg)
       return res.status(400).json({
         success: false,
@@ -133,10 +131,12 @@ exports.updateOrganization = async (req, res) => {
         _id: customers[i],
         organization: { $ne: req.params.id },
       });
-      if (customer)
+      console.log("customer", customer);
+
+      if (customer && customer.organization !== null)
         return res.status(399).json({
           success: false,
-          message: `Customer by the id of ${customers[i]} already has a an organization`,
+          message: `Customer by the id of ${customers[i]} already has an organization`,
         });
     }
 
@@ -153,7 +153,7 @@ exports.updateOrganization = async (req, res) => {
         { $set: { organization: updatedOrganization._id } }
       );
 
-      const deletedCustomers = oldOrg.customers.filter(
+      const deletedCustomers = oldOrg?.customers?.filter(
         (customer) => !customers.includes(customer.toString())
       );
 
