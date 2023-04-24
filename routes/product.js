@@ -3,7 +3,7 @@ const router = require("express").Router();
 const {
   createproduct,
   updateProduct,
-  deleteProduct,
+  // deleteProduct,
   getProduct,
   getproductsPaginated,
   findProductsByTextSearch,
@@ -31,7 +31,7 @@ router
 router
   .route("/:id")
   .put(verifyTokenAndAdmin, validateMongoId, validate, updateProduct)
-  .delete(verifyTokenAndAdmin, validateMongoId, deleteProduct)
   .get(verifyTokenAndAdmin, validateMongoId, getProduct);
+//.delete(verifyTokenAndAdmin, validateMongoId, deleteProduct)
 
 module.exports = router;
