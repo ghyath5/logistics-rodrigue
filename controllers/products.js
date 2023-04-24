@@ -41,6 +41,11 @@ exports.createproduct = async (req, res) => {
         newProduct.generatedCode = codeid;
         let savedProduct = await newProduct.save();
         await XeroHelper.synchProductToXero(savedProduct);
+        if (newProduct.categoryId) {
+          await Category.findByIdAndUpdate(newProduct.categoryId, {
+            $inc: { productCount: 1 },
+          });
+        }
         res.status(200).json(savedProduct);
         await Sharedrecords.findByIdAndUpdate("63663fa59b531a420083d78f", {
           $inc: { productcodeid: 1 },
@@ -55,6 +60,7 @@ exports.createproduct = async (req, res) => {
 };
 exports.updateProduct = async (req, res) => {
   try {
+    const oldProduct = await Products.findById(req.params.id);
     const updatedProduct = await Products.findByIdAndUpdate(
       req.params.id,
       {
@@ -64,6 +70,19 @@ exports.updateProduct = async (req, res) => {
     );
     if (updatedProduct) {
       await XeroHelper.synchProductToXero(updatedProduct);
+
+      if (
+        oldProduct.categoryId &&
+        oldProduct.categoryId.toString() != updatedProduct.categoryId.toString()
+      ) {
+        await Category.findByIdAndUpdate(oldProduct.categoryId, {
+          $inc: { productCount: -1 },
+        });
+        await Category.findByIdAndUpdate(updatedProduct.categoryId, {
+          $inc: { productCount: 1 },
+        });
+      }
+
       res.status(200).json(updatedProduct);
     } else {
       res.status(404).json("No product was found with this id !");
