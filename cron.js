@@ -42,7 +42,7 @@ cron.schedule("0 1 * * *", async () => {
       isarchived: false,
       "deliveryoccur.number": { $ne: 0 },
       $or: [
-        { sheduledCall: { $exists: false } },
+        { "sheduledCall.date": { $exists: false } },
         {
           "sheduledCall.date": {
             $lte: moment().subtract(1, "weeks").endOf("day").toDate(),

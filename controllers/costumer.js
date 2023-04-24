@@ -358,7 +358,7 @@ exports.getCustomersToCall = async (req, res) => {
       "deliveryoccur.number": { $ne: 0 },
       ...filters,
       $or: [
-        { sheduledCall: { $exists: false } },
+        { "sheduledCall.date": { $exists: false } },
         {
           "sheduledCall.date": {
             $lte: moment().endOf("day").toDate(),
