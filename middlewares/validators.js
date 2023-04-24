@@ -78,7 +78,6 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("Postal code is required"),
-  check("region").trim().not().isEmpty().withMessage("Region is required"),
   check("city").trim().not().isEmpty().withMessage("City is required"),
   check("address").trim().not().isEmpty().withMessage("Address is required"),
 ];

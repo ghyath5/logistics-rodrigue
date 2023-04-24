@@ -400,6 +400,14 @@ const getInvoiceAsPdf = async (orderId) => {
 //     console.log(err);
 //   });
 
+// synchAllCustomersFromXero()
+//   .then(() => {
+//     console.log("All products synched successfully");
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
 module.exports = {
   createCustomers,
   getCustomer,

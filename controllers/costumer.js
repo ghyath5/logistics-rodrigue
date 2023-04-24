@@ -66,8 +66,8 @@ exports.createCostumer = async (req, res) => {
       { new: true }
     );
   } catch (err) {
-    console.log("err", err);
-    // await log(err);
+    console.log("createCostumer err", err);
+    await log(err);
     res.status(500).json(err);
   }
 };
