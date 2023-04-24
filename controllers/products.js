@@ -78,6 +78,7 @@ exports.updateProduct = async (req, res) => {
         await Category.findByIdAndUpdate(oldProduct.categoryId, {
           $inc: { productCount: -1 },
         });
+
         await Category.findByIdAndUpdate(updatedProduct.categoryId, {
           $inc: { productCount: 1 },
         });
@@ -94,6 +95,7 @@ exports.updateProduct = async (req, res) => {
       res.status(404).json("No product was found with this id !");
     }
   } catch (err) {
+    console.log("updateProduct err", err);
     await log(err);
     res.status(500).json(err);
   }
