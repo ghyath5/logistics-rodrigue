@@ -83,6 +83,12 @@ exports.updateProduct = async (req, res) => {
         });
       }
 
+      if (!oldProduct.categoryId && updatedProduct.categoryId) {
+        await Category.findByIdAndUpdate(updatedProduct.categoryId, {
+          $inc: { productCount: 1 },
+        });
+      }
+
       res.status(200).json(updatedProduct);
     } else {
       res.status(404).json("No product was found with this id !");
