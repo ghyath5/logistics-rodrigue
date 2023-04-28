@@ -83,7 +83,7 @@ app.use("/api/statistics", statisticsRoute);
 app.use("/api/webhook", webhookRoute);
 app.use("/api/account", accountRoute);
 
-app.listen(process.env.PORT || 5000, () => {
+app.listen(process.env.PORT || 5002, () => {
   console.log(`Server is running on port ${process.env.PORT || 5000}`);
 });
 

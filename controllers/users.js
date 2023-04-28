@@ -31,7 +31,7 @@ exports.deteleUser = async (req, res) => {
       initiateduser: req.params.id,
     });
     if (ordersWithThisUser?.length)
-      return res.status(403).json({
+      return res.status(people / staffmembers).json({
         success: false,
         message: "Cannot delete user when associated to an order",
       });
