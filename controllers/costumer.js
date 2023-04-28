@@ -16,7 +16,7 @@ const XeroHelper = require("../helpers/Xero");
 // 63bfdda23c0361cc932597da
 
 exports.createCostumer = async (req, res) => {
-  const { businessname, email, abn } = req.body;
+  const { businessname, abn } = req.body;
   const newCustomer = new Customer(req.body);
   const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
   let codeid = codeSequence.customercodeid;
@@ -36,13 +36,14 @@ exports.createCostumer = async (req, res) => {
     });
   }
 
-  const abnUser = await Customer.findOne({ abn });
-  if (abnUser) {
-    return res.status(400).json({
-      success: false,
-      message: "This ABN is already in use, please choose a different one",
-    });
-  }
+  // const abnUser = await Customer.findOne({ abn });
+  // if (abnUser) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "This ABN is already in use, please choose a different one",
+  //   });
+  // }
+
   // const emailUser = await Customer.findOne({ email });
   // if (emailUser) {
   //   return res.status(400).json({
@@ -95,12 +96,12 @@ exports.updateCostumer = async (req, res) => {
       _id: { $ne: req.params.id },
     });
 
-    if (existsAbn) {
-      return res.status(400).json({
-        success: false,
-        message: "This ABN is already in use, please choose a different one",
-      });
-    }
+    // if (existsAbn) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "This ABN is already in use, please choose a different one",
+    //   });
+    // }
 
     const oldCustomer = await Customer.findById(req.params.id);
 
