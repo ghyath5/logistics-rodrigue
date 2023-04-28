@@ -102,6 +102,8 @@ exports.updateCostumer = async (req, res) => {
       });
     }
 
+    const oldCustomer = await Customer.findById(req.params.id);
+
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       {
@@ -110,6 +112,12 @@ exports.updateCostumer = async (req, res) => {
       { new: true }
     );
     if (updatedCustomer) {
+      if (oldCustomer.preferredday !== updatedCustomer.preferredday) {
+        await Customer.findByIdAndUpdate(req.params.id, {
+          $unset: { "sheduledCall.date": 1 },
+        });
+      }
+
       const route = await Route.findOne({ customers: req.params.id });
       if (route._id.toString() !== updatedCustomer.routeId.toString()) {
         await Route.findByIdAndUpdate(route._id, {
