@@ -74,6 +74,7 @@ exports.createCostumer = async (req, res) => {
 };
 exports.updateCostumer = async (req, res) => {
   const { promotions, businessname, abn } = req.body;
+
   try {
     if (promotions) {
     }
@@ -91,10 +92,10 @@ exports.updateCostumer = async (req, res) => {
       });
     }
 
-    const existsAbn = await Customer.findOne({
-      abn,
-      _id: { $ne: req.params.id },
-    });
+    // const existsAbn = await Customer.findOne({
+    //   abn,
+    //   _id: { $ne: req.params.id },
+    // });
 
     // if (existsAbn) {
     //   return res.status(400).json({
@@ -135,6 +136,7 @@ exports.updateCostumer = async (req, res) => {
       res.status(404).json("no costumer was found with this id");
     }
   } catch (err) {
+    console.log("updateCostumer err", err);
     await log(err);
     res.status(500).json(err);
     console.log("updateCostumer err", err);
