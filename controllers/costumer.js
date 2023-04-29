@@ -300,7 +300,7 @@ exports.getTopCustomers = async (req, res) => {
       { $sort: { totalOrdersAmount: -1 } },
       { $limit: total },
     ]);
-    console.log("topCustomers", topCustomers);
+
     const names = topCustomers.map((cust) => cust.name);
     const totalOrdersAmount = topCustomers.map(
       (cust) => cust.totalOrdersAmount

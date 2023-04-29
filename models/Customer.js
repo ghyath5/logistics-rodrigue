@@ -8,7 +8,7 @@ const CustomerSchema = new mongoose.Schema(
     address: { type: String },
     city: { type: String },
     region: { type: String },
-    postcode: { type: Number },
+    postcode: { type: String },
     isarchived: { type: Boolean, default: false },
     notes: { type: String },
     firstname: { type: String },
