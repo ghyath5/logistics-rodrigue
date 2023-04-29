@@ -36,13 +36,15 @@ exports.createCostumer = async (req, res) => {
     });
   }
 
-  // const abnUser = await Customer.findOne({ abn });
-  // if (abnUser) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: "This ABN is already in use, please choose a different one",
-  //   });
-  // }
+  if (abn) {
+    const abnUser = await Customer.findOne({ abn });
+    if (abnUser) {
+      return res.status(400).json({
+        success: false,
+        message: "This ABN is already in use, please choose a different one",
+      });
+    }
+  }
 
   // const emailUser = await Customer.findOne({ email });
   // if (emailUser) {
@@ -92,17 +94,18 @@ exports.updateCostumer = async (req, res) => {
       });
     }
 
-    // const existsAbn = await Customer.findOne({
-    //   abn,
-    //   _id: { $ne: req.params.id },
-    // });
-
-    // if (existsAbn) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "This ABN is already in use, please choose a different one",
-    //   });
-    // }
+    if (abn) {
+      const existsAbn = await Customer.findOne({
+        abn,
+        _id: { $ne: req.params.id },
+      });
+      if (existsAbn) {
+        return res.status(400).json({
+          success: false,
+          message: "This ABN is already in use, please choose a different one",
+        });
+      }
+    }
 
     const oldCustomer = await Customer.findById(req.params.id);
 
@@ -121,7 +124,10 @@ exports.updateCostumer = async (req, res) => {
       }
 
       const route = await Route.findOne({ customers: req.params.id });
-      if (route && route._id.toString() !== updatedCustomer.routeId.toString()) {
+      if (
+        route &&
+        route._id.toString() !== updatedCustomer.routeId.toString()
+      ) {
         await Route.findByIdAndUpdate(route._id, {
           $pull: { customers: req.params.id },
         });
