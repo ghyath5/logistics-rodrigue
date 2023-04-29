@@ -288,7 +288,7 @@ exports.getTopCustomers = async (req, res) => {
       {
         $group: {
           _id: "$_id",
-          name: { $first: "$customername" },
+          name: { $first: "$businessname" },
           totalOrdersAmount: { $sum: "$orders.totalamount" },
         },
       },
@@ -300,6 +300,7 @@ exports.getTopCustomers = async (req, res) => {
       { $sort: { totalOrdersAmount: -1 } },
       { $limit: total },
     ]);
+    console.log("topCustomers", topCustomers);
     const names = topCustomers.map((cust) => cust.name);
     const totalOrdersAmount = topCustomers.map(
       (cust) => cust.totalOrdersAmount

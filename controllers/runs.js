@@ -166,7 +166,7 @@ exports.getRunPdf = async (req, res) => {
     }
   } catch (err) {
     //await log(err);
-    console.log("err", err.response.body.Elements[0].ValidationErrors);
+    console.log("err", err.response);
     res.status(500).json(err.response.body);
   }
 };

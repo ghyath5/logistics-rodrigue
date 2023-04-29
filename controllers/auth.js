@@ -46,15 +46,15 @@ exports.signup = async (req, res) => {
   try {
     let savedUser = await newUser.save();
 
-    const accessToken = jwt.sign(
-      {
-        id: savedUser._id,
-        role: savedUser.role,
-      },
-      process.env.JWT_SEC,
-      { expiresIn: "3d" }
-    );
-    res.status(200).json({ savedUser, accessToken });
+    // const accessToken = jwt.sign(
+    //   {
+    //     id: savedUser._id,
+    //     role: savedUser.role,
+    //   },
+    //   process.env.JWT_SEC,
+    //   { expiresIn: "3d" }
+    // );
+    res.status(200).json(savedUser);
   } catch (err) {
     await log(err);
     res.status(500).json(err);
