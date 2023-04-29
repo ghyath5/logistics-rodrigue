@@ -392,13 +392,13 @@ const getInvoiceAsPdf = async (orderId) => {
 //     console.log(err);
 //   });
 
-synchAllProductsFromXero()
-  .then(() => {
-    console.log("All products synched successfully");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+// synchAllProductsFromXero()
+//   .then(() => {
+//     console.log("All products synched successfully");
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 // synchAllCustomersFromXero()
 //   .then(() => {

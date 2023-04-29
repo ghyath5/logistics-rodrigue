@@ -158,6 +158,11 @@ exports.createOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Customer not found" });
 
+    if (ourCustomer.routeId == null)
+      return res
+        .status(400)
+        .json({ success: false, message: "Customer doesn't have a route" });
+
     if (newOrder.isBackOrder) {
       const pdf = await Xero.getInvoiceAsPdf(newOrder._id);
       const order = await Order.findById(newOrder._id).populate(
