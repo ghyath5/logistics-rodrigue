@@ -120,7 +120,7 @@ exports.updateCostumer = async (req, res) => {
       }
 
       const route = await Route.findOne({ customers: req.params.id });
-      if (route._id.toString() !== updatedCustomer.routeId.toString()) {
+      if (route && route._id.toString() !== updatedCustomer.routeId.toString()) {
         await Route.findByIdAndUpdate(route._id, {
           $pull: { customers: req.params.id },
         });
@@ -137,6 +137,7 @@ exports.updateCostumer = async (req, res) => {
   } catch (err) {
     await log(err);
     res.status(500).json(err);
+    console.log("updateCostumer err", err);
   }
 };
 exports.deleteCostumer = async (req, res) => {
