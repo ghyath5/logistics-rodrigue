@@ -103,10 +103,9 @@ app.listen(process.env.PORT || 5002, () => {
 // PASS = pa$$w0rd
 // ==========================
 
-// customers from xero
 // call customers on friday if their
-// search by run by date and driver name
 // preffered day is monday
+// search by run by date and driver name
 // cancel an invoice in xero from the ERP
 // delete an invoice in xero from the ERP
 // edit an order in xero from the ERP
@@ -115,3 +114,4 @@ app.listen(process.env.PORT || 5002, () => {
 // ===========================
 // check if the groupings in xero can be imported to the system
 // do fortnight option for the newly imported
+// customers from xero
