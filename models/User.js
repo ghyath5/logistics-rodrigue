@@ -12,8 +12,8 @@ const UserSchema = new mongoose.Schema(
     ordersCount: { type: Number, default: 0 },
     theme: { type: Number, default: 0 },
 
-    // 0 = user
-    // 1 = admin
+    // role is 1 for all users (not customers), only one account is upper admin
+    // and ahs his id in the .env
   },
   { timestamps: true }
 );

@@ -1,6 +1,5 @@
 exports.authRoute = require("./auth");
 exports.runsRoute = require("./runs");
-exports.billersRoute = require("./biller");
 exports.usersRoute = require("./users");
 exports.routeRoute = require("./routes");
 exports.ordersRoute = require("./orders");

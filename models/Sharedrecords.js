@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// the id for this SharedRecords : 63663fa59b531a420083d78f
 const SharedRecordsSchema = new mongoose.Schema(
   {
     customercodeid: { type: Number },
@@ -13,4 +14,3 @@ const SharedRecordsSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Sharedrecords", SharedRecordsSchema);
-// 63663fa59b531a420083d78f

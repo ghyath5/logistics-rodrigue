@@ -2,22 +2,13 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const express = require("express");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const compression = require("compression");
+
 require("./cron");
 const app = express();
-const bodyParser = require("body-parser");
 
-// https://monjay.app.qore.com.au
-//
-//
-// admin@mjmezza.com.au
-// Holden15
-
-// =========================
-
-// https://go.xero.com/app/!1Y5zX/dashboard&redirectCount=0&apToken=c3caaa7e-755e-4651-82cb-395645acd0ed
-// USID = rodrick.abdallah@gmail.com
-// PASS = pa$$w0rd
+require("./helpers/Xero");
 
 const {
   authRoute,
@@ -45,10 +36,10 @@ dotenv.config();
 
 const connectWithRetry = () => {
   mongoose
-    .connect(process.env.MONGO_URL || "mongodb://0.0.0.0:27017/monjay")
+    .connect(process.env.MONGO_URL)
     .then(() => console.log("DB Connection Successfull!"))
     .catch((err) => {
-      console.log(err);
+      console.log(`DB Connection ${err}`);
       setTimeout(connectWithRetry, 5000);
     });
 };
@@ -66,7 +57,6 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", authRoute);
 app.use("/api/drivers", driversRoute);
 app.use("/api/runs", runsRoute);
-app.use("/api/biller", billersRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/routes", routeRoute);
 app.use("/api/orders", ordersRoute);
@@ -87,25 +77,41 @@ app.listen(process.env.PORT || 5002, () => {
   console.log(`Server is running on port ${process.env.PORT || 5000}`);
 });
 
-const xeroHelper = require("./helpers/Xero");
+// =========================
+// OLD MONJAY SYSTEM CREDENTIALS :
+// =========================
+//
+// https://monjay.app.qore.com.au
+// admin@mjmezza.com.au
+// Holden15
+// =========================
 
+// =========================
+// TRIAL XERO ACCOUNT CREDENTIALS :
+// =========================
+//
 // emileib.lb@gmail.com
 // &YizQ2t.V@9U4/V
+// =========================
 
-// xeroHelper
-//   .createCustomers()
-//   .then(() => console.log("done"))
-//   .catch((err) => console.log("Error:", err.response));
+// =========================
+// PRODUCTION XERO ACCOUNT CREDENTIALS :
+// =========================
+//
+// https://go.xero.com/app/!1Y5zX/dashboard&redirectCount=0&apToken=c3caaa7e-755e-4651-82cb-395645acd0ed
+// USID = rodrick.abdallah@gmail.com
+// PASS = pa$$w0rd
+// ==========================
 
-// xeroHelper.getCustomer("65646100-16b8-4922-bd73-b847828501ef");
+// customers from xero
+// call customers on friday if their
+// search by run by date and driver name
+// preffered day is monday
+// cancel an invoice in xero from the ERP
+// delete an invoice in xero from the ERP
+// edit an order in xero from the ERP
+// grouping of the products by run depending on their weight
 
-// 200 : OK
-// 201 : CREATED
-// 400 : BAD REQUEST
-// 401 : UNAUTHORIZED
-// 403 : FORBIDDEN
-// 404 : NOT FOUND
-
-// title above all charts : products and sales analysis
-// add notes to order creation
-// top selling product
+// ===========================
+// check if the groupings in xero can be imported to the system
+// do fortnight option for the newly imported

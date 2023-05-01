@@ -3,24 +3,19 @@ const Products = require("../models/Products");
 const { log } = require("../helpers/Loger");
 
 exports.createCategory = async (req, res) => {
-  const newCategory = new Category(req.body);
-  if (req.body.name) {
-    try {
-      const categoryName = await Category.findOne({ name: req.body.name });
-      if (categoryName) {
-        return res
-          .status(403)
-          .json("A category with this name has been created");
-      } else {
-        const savedCategory = await newCategory.save();
-        res.status(200).json(savedCategory);
-      }
-    } catch (err) {
-      await log(err);
-      res.status(500).json(err);
+  try {
+    const newCategory = new Category(req.body);
+    const categoryName = await Category.findOne({ name: req.body.name });
+    if (categoryName) {
+      return res.status(400).json("A category with this name has been created");
+    } else {
+      const savedCategory = await newCategory.save();
+      res.status(200).json(savedCategory);
     }
-  } else {
-    return res.status(400).json("A category name is required");
+  } catch (err) {
+    console.log("createCategory err", err);
+    await log(`createCategory error : ${err}`);
+    res.status(500).json(err);
   }
 };
 exports.updateCategory = async (req, res) => {
@@ -38,7 +33,8 @@ exports.updateCategory = async (req, res) => {
       res.status(404).json("There is no category with this id");
     }
   } catch (err) {
-    await log(err);
+    console.log("updateCategory err", err);
+    await log(`updateCategory error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -58,7 +54,8 @@ exports.deleteCategory = async (req, res) => {
       return res.status(200).json("Category deleted successfully...");
     }
   } catch (err) {
-    await log(err);
+    console.log("deleteCategory err", err);
+    await log(`deleteCategory error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -77,7 +74,9 @@ exports.getCategory = async (req, res) => {
       res.status(404).json("There is no category with this id");
     }
   } catch (err) {
-    await log(err);
+    console.log("getCategory err", err);
+    await log(`getCategory error : ${err}`);
+
     res.status(500).json(err);
   }
 };
@@ -89,13 +88,15 @@ exports.getAllCategories = async (req, res) => {
       categoryCount,
       categories,
     };
+
     if (categories) {
       return res.status(200).json(objectTosend);
     } else {
       return res.status(200).json("No categories found");
     }
   } catch (err) {
-    await log(err);
+    console.log("getAllCategories err", err);
+    await log(`getAllCategories error : ${err}`);
     res.status(500).json(err);
   }
 };

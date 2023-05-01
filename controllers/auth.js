@@ -45,18 +45,10 @@ exports.signup = async (req, res) => {
   });
   try {
     let savedUser = await newUser.save();
-
-    // const accessToken = jwt.sign(
-    //   {
-    //     id: savedUser._id,
-    //     role: savedUser.role,
-    //   },
-    //   process.env.JWT_SEC,
-    //   { expiresIn: "3d" }
-    // );
     res.status(200).json(savedUser);
   } catch (err) {
-    await log(err);
+    console.log("signUp err", err);
+    await log(`signUp error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -101,7 +93,8 @@ exports.login = async (req, res) => {
     const { password, ...others } = user._doc;
     return res.status(200).json({ ...others, accessToken });
   } catch (err) {
-    await log(err);
+    console.log("login err", err);
+    await log(`login error : ${err}`);
     res.status(500).json(err);
   }
 };

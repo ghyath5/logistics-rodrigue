@@ -372,8 +372,6 @@ const getInvoiceAsPdf = async (orderId) => {
   // return base64;
 };
 
-// test it on order 64004a69d6674efa61fe471a
-
 // createInvoice("64004a69d6674efa61fe471a")
 //   .then((res) => {
 //     console.log(res);

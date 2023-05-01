@@ -6,7 +6,6 @@ exports.update = async (req, res) => {
   try {
     const { id } = req.user;
     const { name, username, email, phonenumber } = req.body;
-
     const user = await User.findByIdAndUpdate(
       id,
       {
@@ -17,17 +16,15 @@ exports.update = async (req, res) => {
       },
       { new: true }
     );
-
     if (!user) return res.status(404).json("No User was found by this id");
-
     const { password, ...others } = user._doc;
-
     res.status(200).json({
       message: "User updated successfully",
       user: others,
     });
   } catch (err) {
-    await log(err);
+    console.log("updateAccount", err);
+    await log(`updateAccount error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -47,7 +44,8 @@ exports.getAccount = async (req, res) => {
       user: others,
     });
   } catch (err) {
-    await log(err);
+    console.log("getAccount", err);
+    await log(`getAccount error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -88,8 +86,8 @@ exports.changePassword = async (req, res) => {
       message: "Password changed successfully",
     });
   } catch (err) {
-    console.log(err);
-    await log(err);
+    console.log("changePassword", err);
+    await log(`change password error : ${err}`);
     res.status(500).json(err);
   }
 };

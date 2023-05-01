@@ -115,7 +115,6 @@ exports.creatingOrder = [
     .isEmpty()
     .withMessage("Please insert at least one product"),
 ];
-// Creating Biller
 exports.validateName = [
   check("name").trim().not().isEmpty().withMessage("Name is missing"),
 ];
