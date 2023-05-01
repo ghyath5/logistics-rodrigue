@@ -32,14 +32,11 @@ exports.update = async (req, res) => {
 exports.getAccount = async (req, res) => {
   try {
     const { id } = req.user;
-
     const user = await User.findById(id);
-
     if (!user) return res.status(404).json("Account not found");
-
     const { password, ...others } = user._doc;
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "User fetched successfully",
       user: others,
     });
