@@ -128,7 +128,7 @@ const synchCustomerFromXero = async (contactId) => {
     console.log("Customer updated successfully");
   } else {
     const codeSequence = await Sharedrecords.findById(
-      "63663fa59b531a420083d78f"
+      process.env.SHARED_RECORDS_ID
     );
     let codeid = codeSequence.customercodeid;
     codeid = codeid.toString();
@@ -236,7 +236,7 @@ const synchProductFromXero = async (productId) => {
   } else {
     // create product
     const codeSequence = await Sharedrecords.findById(
-      "63663fa59b531a420083d78f"
+      process.env.SHARED_RECORDS_ID
     );
     let codeid = codeSequence.productcodeid;
     codeid = codeid.toString();

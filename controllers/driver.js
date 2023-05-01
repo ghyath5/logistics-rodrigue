@@ -14,7 +14,7 @@ exports.createDriver = async (req, res) => {
         .json("A driver with this name has already been created");
     } else {
       const codeSequence = await Sharedrecords.findById(
-        "63663fa59b531a420083d78f"
+        process.env.SHARED_RECORDS_ID
       );
       let codeid = codeSequence.drivercodeid;
       codeid = codeid.toString();
@@ -25,7 +25,7 @@ exports.createDriver = async (req, res) => {
       newDriver.code = codeid;
       const savedDriver = await newDriver.save();
       res.status(200).json(savedDriver);
-      await Sharedrecords.findByIdAndUpdate("63663fa59b531a420083d78f", {
+      await Sharedrecords.findByIdAndUpdate(process.env.SHARED_RECORDS_ID, {
         $inc: { drivercodeid: 1 },
       });
     }

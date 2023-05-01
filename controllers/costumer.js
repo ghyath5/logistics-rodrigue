@@ -1,60 +1,58 @@
-const Customer = require("../models/Customer");
-const Vehicle = require("../models/Vehicle");
-const Run = require("../models/Run");
-const Order = require("../models/Orders");
-const Sharedrecords = require("../models/Sharedrecords");
-const Route = require("../models/Route");
-const Organization = require("../models/Organization");
-const { log } = require("../helpers/Loger");
 const moment = require("moment");
 
+const Run = require("../models/Run");
+const Route = require("../models/Route");
+const Order = require("../models/Orders");
+const { log } = require("../helpers/Loger");
+const Vehicle = require("../models/Vehicle");
 const XeroHelper = require("../helpers/Xero");
-
-// 63bfdcf93c0361cc932597cb
-// 63bfdd3c3c0361cc932597d0
-// 63bfdd633c0361cc932597d5
-// 63bfdda23c0361cc932597da
+const Customer = require("../models/Customer");
+const Organization = require("../models/Organization");
+const Sharedrecords = require("../models/Sharedrecords");
 
 exports.createCostumer = async (req, res) => {
-  const { businessname, abn } = req.body;
-  const newCustomer = new Customer(req.body);
-  const codeSequence = await Sharedrecords.findById("63663fa59b531a420083d78f");
-  let codeid = codeSequence.customercodeid;
-  codeid = codeid.toString();
+  try {
+    const { businessname, abn, email } = req.body;
+    const newCustomer = new Customer(req.body);
+    const codeSequence = await Sharedrecords.findById(
+      process.env.SHARED_RECORDS_ID
+    );
+    let codeid = codeSequence.customercodeid;
+    codeid = codeid.toString();
 
-  while (codeid.length < 4) {
-    codeid = "0" + codeid;
-  }
-  newCustomer.codeid = codeid;
+    while (codeid.length < 4) {
+      codeid = "0" + codeid;
+    }
+    newCustomer.codeid = codeid;
 
-  const businessnameUser = await Customer.findOne({ businessname });
-  if (businessnameUser) {
-    return res.status(400).json({
-      success: false,
-      message:
-        "This businessname is already in use, please choose a different one",
-    });
-  }
-
-  if (abn) {
-    const abnUser = await Customer.findOne({ abn });
-    if (abnUser) {
+    const businessnameUser = await Customer.findOne({ businessname });
+    if (businessnameUser) {
       return res.status(400).json({
         success: false,
-        message: "This ABN is already in use, please choose a different one",
+        message:
+          "This businessname is already in use, please choose a different one",
       });
     }
-  }
 
-  // const emailUser = await Customer.findOne({ email });
-  // if (emailUser) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: "This email is already in use, try sign-in with a different one",
-  //   });
-  // }
+    if (abn) {
+      const abnUser = await Customer.findOne({ abn });
+      if (abnUser) {
+        return res.status(400).json({
+          success: false,
+          message: "This ABN is already in use, please choose a different one",
+        });
+      }
+    }
 
-  try {
+    const emailUser = await Customer.findOne({ email });
+    if (emailUser) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This email is already in use, try sign-in with a different one",
+      });
+    }
+
     const savedCustomer = await newCustomer.save();
     await Route.findByIdAndUpdate(newCustomer.routeId, {
       $push: { customers: savedCustomer._id },
@@ -62,7 +60,7 @@ exports.createCostumer = async (req, res) => {
     await XeroHelper.synchCustomerToXero(savedCustomer);
     res.status(200).json(savedCustomer);
     await Sharedrecords.findByIdAndUpdate(
-      "63663fa59b531a420083d78f",
+      process.env.SHARED_RECORDS_ID,
       {
         $inc: { customercodeid: 1 },
       },
