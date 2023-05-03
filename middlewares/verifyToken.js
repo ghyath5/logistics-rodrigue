@@ -16,6 +16,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// so one can update himself for example
 const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.user.id === req.params.id || req.user.role == 1) {

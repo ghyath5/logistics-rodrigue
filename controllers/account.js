@@ -23,7 +23,6 @@ exports.update = async (req, res) => {
       user: others,
     });
   } catch (err) {
-    console.log("updateAccount", err);
     await log(`updateAccount error : ${err}`);
     res.status(500).json(err);
   }

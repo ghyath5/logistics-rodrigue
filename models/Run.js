@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Driver = require("./driver");
+const Driver = require("./Driver");
 const Vehicle = require("./Vehicle");
 const moment = require("moment");
 
@@ -27,11 +27,15 @@ const RunSchema = new mongoose.Schema(
 RunSchema.pre("insertMany", async function (done, docs) {
   for (const doc of docs) {
     if (!doc.driver) {
-      const driver = await mongoose.model("Run", RunSchema).getRandomAvailableVehicle(doc.date);
-      doc.driver = driver
+      const driver = await mongoose
+        .model("Run", RunSchema)
+        .getRandomAvailableVehicle(doc.date);
+      doc.driver = driver;
     }
     if (!doc.vehicle) {
-      let vehicle = await mongoose.model("Run", RunSchema).getRandomAvailableVehicle(doc.date);
+      let vehicle = await mongoose
+        .model("Run", RunSchema)
+        .getRandomAvailableVehicle(doc.date);
       doc.vehicle = vehicle;
     }
   }
@@ -41,42 +45,51 @@ RunSchema.pre("insertMany", async function (done, docs) {
 RunSchema.pre("save", async function (done) {
   if (!this.isNew) return done();
   if (!this.vehicle) {
-    let vehicle = await mongoose.model("Run", RunSchema).getRandomAvailableVehicle(this.date);
+    let vehicle = await mongoose
+      .model("Run", RunSchema)
+      .getRandomAvailableVehicle(this.date);
     this.vehicle = vehicle;
   }
   if (!this.driver) {
-    let driver = await mongoose.model("Run", RunSchema).getRandomAvailableDriver(this.date);
-    this.driver = driver
+    let driver = await mongoose
+      .model("Run", RunSchema)
+      .getRandomAvailableDriver(this.date);
+    this.driver = driver;
   }
   return done();
 });
 
 RunSchema.statics.getRandomAvailableVehicle = async function (runDate) {
   try {
-    const runs = await this.find({ date: { $ne: moment(runDate).toDate() } }).populate('vehicle')
-    let availableVehicles = runs.map((run) => run?.vehicle?._id).filter((v) => v)
+    const runs = await this.find({
+      date: { $ne: moment(runDate).toDate() },
+    }).populate("vehicle");
+    let availableVehicles = runs
+      .map((run) => run?.vehicle?._id)
+      .filter((v) => v);
     const allNotAssociatedVehicles = await Vehicle.aggregate([
       {
         $lookup: {
-          from: 'runs',
-          foreignField: 'vehicle',
-          localField: '_id',
-          as: 'runs'
-        }
+          from: "runs",
+          foreignField: "vehicle",
+          localField: "_id",
+          as: "runs",
+        },
       },
 
       {
         $match: {
-          $or: [
-            { runs: { $exists: false } },
-            { runs: { $size: 0 } }
-          ]
-        }
-      }
-    ])
-    availableVehicles = [...allNotAssociatedVehicles.map((vehicle) => vehicle._id), ...availableVehicles]
-    const vehicle = availableVehicles[Math.floor(Math.random() * availableVehicles.length)];
-    return vehicle
+          $or: [{ runs: { $exists: false } }, { runs: { $size: 0 } }],
+        },
+      },
+    ]);
+    availableVehicles = [
+      ...allNotAssociatedVehicles.map((vehicle) => vehicle._id),
+      ...availableVehicles,
+    ];
+    const vehicle =
+      availableVehicles[Math.floor(Math.random() * availableVehicles.length)];
+    return vehicle;
   } catch (e) {
     return null;
   }
@@ -84,30 +97,33 @@ RunSchema.statics.getRandomAvailableVehicle = async function (runDate) {
 
 RunSchema.statics.getRandomAvailableDriver = async function (runDate) {
   try {
-    const runs = await this.find({ date: { $ne: moment(runDate).toDate() } }).populate('driver')
-    let availableDrivers = runs.map((run) => run?.driver?._id).filter((v) => v)
+    const runs = await this.find({
+      date: { $ne: moment(runDate).toDate() },
+    }).populate("driver");
+    let availableDrivers = runs.map((run) => run?.driver?._id).filter((v) => v);
     const allNotAssociatedDrivers = await Driver.aggregate([
       {
         $lookup: {
-          from: 'runs',
-          foreignField: 'driver',
-          localField: '_id',
-          as: 'runs'
-        }
+          from: "runs",
+          foreignField: "driver",
+          localField: "_id",
+          as: "runs",
+        },
       },
 
       {
         $match: {
-          $or: [
-            { runs: { $exists: false } },
-            { runs: { $size: 0 } }
-          ]
-        }
-      }
-    ])
-    availableDrivers = [...allNotAssociatedDrivers.map((driver) => driver._id), ...availableDrivers]
-    const driver = availableDrivers[Math.floor(Math.random() * availableDrivers.length)];
-    return driver
+          $or: [{ runs: { $exists: false } }, { runs: { $size: 0 } }],
+        },
+      },
+    ]);
+    availableDrivers = [
+      ...allNotAssociatedDrivers.map((driver) => driver._id),
+      ...availableDrivers,
+    ];
+    const driver =
+      availableDrivers[Math.floor(Math.random() * availableDrivers.length)];
+    return driver;
   } catch (e) {
     console.log(e);
     return null;

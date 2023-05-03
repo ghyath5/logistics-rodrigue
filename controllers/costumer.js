@@ -67,18 +67,15 @@ exports.createCostumer = async (req, res) => {
       { new: true }
     );
   } catch (err) {
-    console.log("createCostumer err", err);
-    await log(err);
+    console.log("createCustomer err", err);
+    await log(`createCustomer error : ${err}`);
     res.status(500).json(err);
   }
 };
 exports.updateCostumer = async (req, res) => {
-  const { promotions, businessname, abn } = req.body;
+  const { businessname, abn } = req.body;
 
   try {
-    if (promotions) {
-    }
-
     const existsBusinessName = await Customer.findOne({
       businessname,
       _id: { $ne: req.params.id },
@@ -91,7 +88,6 @@ exports.updateCostumer = async (req, res) => {
           "This businessname is already in use, please choose a different one",
       });
     }
-
     if (abn) {
       const existsAbn = await Customer.findOne({
         abn,
@@ -104,9 +100,7 @@ exports.updateCostumer = async (req, res) => {
         });
       }
     }
-
     const oldCustomer = await Customer.findById(req.params.id);
-
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       {
@@ -120,7 +114,6 @@ exports.updateCostumer = async (req, res) => {
           $unset: { "sheduledCall.date": 1 },
         });
       }
-
       const route = await Route.findOne({ customers: req.params.id });
       if (
         route &&
@@ -135,15 +128,14 @@ exports.updateCostumer = async (req, res) => {
       }
 
       await XeroHelper.synchCustomerToXero(updatedCustomer);
-      res.status(200).json(updatedCustomer);
+      return res.status(200).json(updatedCustomer);
     } else {
-      res.status(404).json("no costumer was found with this id");
+      return res.status(404).json("no costumer was found with this id");
     }
   } catch (err) {
+    await log(`updateCostumer error : ${err}`);
     console.log("updateCostumer err", err);
-    await log(err);
     res.status(500).json(err);
-    console.log("updateCostumer err", err);
   }
 };
 exports.deleteCostumer = async (req, res) => {
@@ -187,7 +179,8 @@ exports.deleteCostumer = async (req, res) => {
       message: "Customer has been successfully deleted...",
     });
   } catch (err) {
-    await log(err);
+    await log(`deleteCostumer error : ${err}`);
+    console.log("deleteCostumer err", err);
     res.status(500).json(err);
   }
 };
@@ -203,7 +196,8 @@ exports.getCostumer = async (req, res) => {
       res.status(404).json("no costumer was found with this id");
     }
   } catch (err) {
-    await log(err);
+    await log(`getCostumer error : ${err}`);
+    console.log("getCostumer err", err);
     res.status(500).json(err);
   }
 };
@@ -216,7 +210,8 @@ exports.getCostumerInternally = async (customerId) => {
       console.log("no customer found");
     }
   } catch (err) {
-    await log(err);
+    await log(`getCostumerInternally error : ${err}`);
+    console.log("getCostumerInternally err", err);
   }
 };
 exports.getCostumerPaginatedArchived = async (req, res) => {
@@ -239,14 +234,13 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
 
     res.status(200).json({ customerCount, customers });
   } catch (err) {
-    console.log("err", err);
-    await log(err);
+    await log(`getCostumerPaginatedArchived error : ${err}`);
+    console.log("getCostumerPaginatedArchived err", err);
     res.status(500).json(err);
   }
 };
 exports.findCustomerByTextSearch = async (req, res) => {
   const { find, page, limit } = req.query;
-
   try {
     const found = await Customer.find({
       $or: [
@@ -262,8 +256,8 @@ exports.findCustomerByTextSearch = async (req, res) => {
     if (!found) return res.status(404).json("no customer was found");
     return res.status(200).json(found);
   } catch (err) {
+    await log(`findCustomerByTextSearch error : ${err}`);
     console.log("findCustomerByTextSearch err", err);
-    await log(err);
     res.status(500).json(err);
   }
 };
@@ -346,7 +340,7 @@ exports.getTopCustomers = async (req, res) => {
     }
 
     let vehicles = allVehicles.filter((vehicle) => vehicle.status == 0);
-    res.json({
+    return res.json({
       data: totalOrdersAmount,
       labels: names,
       todayRuns,
@@ -355,20 +349,17 @@ exports.getTopCustomers = async (req, res) => {
       vehicles,
     });
   } catch (err) {
+    await log(`getTopCustomers error : ${err}`);
     console.log("getTopCustomers err", err);
-    await log(err);
     res.status(500).json(err);
   }
 };
 exports.getCustomersToCall = async (req, res) => {
   try {
     const { routeId } = req.query;
-
     const filters = {};
     if (routeId) filters.routeId = routeId;
-
     const tomorrow = moment().add(1, "days").format("dddd").toLowerCase();
-
     const customers = await Customer.find({
       preferredday: tomorrow,
       isarchived: false,
@@ -409,8 +400,8 @@ exports.getCustomersToCall = async (req, res) => {
 
     res.status(200).json(customers);
   } catch (err) {
+    await log(`getCustomersToCall error : ${err}`);
     console.log("getCustomersToCall err", err);
-    await log(err);
     res.status(500).json(err);
   }
 };
@@ -425,8 +416,8 @@ exports.toggleCall = async (req, res) => {
 
     res.status(200).json(customer);
   } catch (err) {
-    console.log("markAsCalled err", err);
-    await log(err);
+    await log(`toggleCall error : ${err}`);
+    console.log("toggleCall err", err);
     res.status(500).json(err);
   }
 };
@@ -468,7 +459,8 @@ exports.getAllNonOrganizationalCustomers = async (req, res) => {
       return res.status(200).json("No customers found");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllNonOrganizationalCustomers error : ${err}`);
+    console.log("getAllNonOrganizationalCustomers err", err);
     res.status(500).json(err);
   }
 };

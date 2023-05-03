@@ -62,9 +62,9 @@ exports.deleteCategory = async (req, res) => {
 exports.getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-    const productCount = await Products.countDocuments({
-      categoryId: req.params.id,
-    });
+    // const productCount = await Products.countDocuments({
+    //   categoryId: req.params.id,
+    // });
 
     if (category) {
       category.productCount = productCount;

@@ -369,7 +369,7 @@ exports.searchOrderByProductText = async (req, res) => {
       }).select("_id");
       const customersIDSQuery = await Customer.find({
         $or: [
-          { customername: { $regex: name, $options: "i" } },
+          { firstname: { $regex: name, $options: "i" } },
           {
             businessname: { $regex: name, $options: "i" },
           },

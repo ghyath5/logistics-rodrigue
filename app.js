@@ -115,3 +115,8 @@ app.listen(process.env.PORT || 5002, () => {
 // check if the groupings in xero can be imported to the system
 // do fortnight option for the newly imported
 // customers from xero
+
+//==============================
+// TODO: MAURICE :
+// same convention in namings
+// handle getCategory controller

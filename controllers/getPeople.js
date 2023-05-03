@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const Driver = require("../models/driver");
+const Driver = require("../models/Driver");
 const { log } = require("../helpers/Loger");
 
 exports.getAllAdmins = async (req, res) => {

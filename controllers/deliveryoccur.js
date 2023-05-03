@@ -4,14 +4,14 @@ const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
 
 exports.createDeliveryOccur = async (req, res) => {
-  const newDeliveryOccur = new DeliveryOccur(req.body);
-  const codeSequence = await Sharedrecords.findById(
-    process.env.SHARED_RECORDS_ID
-  );
-  let codeid = codeSequence.deliveryoccurcodeid;
-
-  newDeliveryOccur.number = codeid;
   try {
+    const newDeliveryOccur = new DeliveryOccur(req.body);
+    const codeSequence = await Sharedrecords.findById(
+      process.env.SHARED_RECORDS_ID
+    );
+    let codeid = codeSequence.deliveryoccurcodeid;
+
+    newDeliveryOccur.number = codeid;
     const deliveryOccurName = await DeliveryOccur.findOne({
       name: req.body.name,
     });
@@ -31,7 +31,8 @@ exports.createDeliveryOccur = async (req, res) => {
       );
     }
   } catch (err) {
-    await log(err);
+    console.log("createDeliveryOccur err", err);
+    await log(`createDeliveryOccur error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -52,7 +53,8 @@ exports.updateDeliveryOccur = async (req, res) => {
         .json("No delivery occur method was found by this id");
     }
   } catch (err) {
-    await log(err);
+    console.log("createDeliveryOccur err", err);
+    await log(`createDeliveryOccur error : ${err}`);
     res.status(500).json(err);
   }
 };
