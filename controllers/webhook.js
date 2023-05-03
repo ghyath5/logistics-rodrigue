@@ -38,7 +38,7 @@ exports.testWebhook = async (req, res) => {
       res.status(401).send();
     }
   } catch (err) {
-    console.log(err.message);
+    await log(`testWebhook error : ${err.message}`);
     res.status(500).json(err.message);
   }
 };

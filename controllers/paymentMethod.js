@@ -4,13 +4,13 @@ const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 
 exports.createPaymentMethod = async (req, res) => {
-  const newPaymentmethod = new Paymentmethod(req.body);
-  const codeSequence = await Sharedrecords.findById(
-    process.env.SHARED_RECORDS_ID
-  );
-  let codeid = codeSequence.paymentmethodcodeid;
-  newPaymentmethod.number = codeid;
   try {
+    const newPaymentmethod = new Paymentmethod(req.body);
+    const codeSequence = await Sharedrecords.findById(
+      process.env.SHARED_RECORDS_ID
+    );
+    let codeid = codeSequence.paymentmethodcodeid;
+    newPaymentmethod.number = codeid;
     const paymentMethodName = await Paymentmethod.findOne({
       name: req.body.name,
     });
@@ -30,7 +30,7 @@ exports.createPaymentMethod = async (req, res) => {
       );
     }
   } catch (err) {
-    await log(err);
+    await log(`createPaymentMethod error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -49,7 +49,7 @@ exports.updatePaymentMethod = async (req, res) => {
       res.status(404).json("No payment Method found with this id");
     }
   } catch (err) {
-    await log(err);
+    await log(`updatePaymentMethod error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -67,7 +67,7 @@ exports.deletePaymentMethod = async (req, res) => {
     await Paymentmethod.findByIdAndDelete(req.params.id);
     res.status(200).json("Payment method has been deleted...");
   } catch (err) {
-    await log(err);
+    await log(`deletePaymentMethod error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -80,7 +80,7 @@ exports.getPaymentMethod = async (req, res) => {
       res.status(404).json("No payment method found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getPaymentMethod error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -99,7 +99,7 @@ exports.getAllPaymentMethods = async (req, res) => {
       res.status(404).json("No payment methods are created yet !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllPaymentMethods error : ${err}`);
     res.status(500).json(err);
   }
 };

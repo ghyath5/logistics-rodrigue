@@ -4,9 +4,8 @@ const Sharedrecords = require("../models/Sharedrecords");
 const { log } = require("../helpers/Loger");
 
 exports.createDriver = async (req, res) => {
-  const newDriver = new Driver(req.body);
-
   try {
+    const newDriver = new Driver(req.body);
     const driverName = await Driver.findOne({ name: req.body.name });
     if (driverName) {
       return res
@@ -30,7 +29,7 @@ exports.createDriver = async (req, res) => {
       });
     }
   } catch (err) {
-    await log(err);
+    await log(`createDriver error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -50,7 +49,7 @@ exports.updateDriver = async (req, res) => {
       res.status(404).json("No driver was found with this id");
     }
   } catch (err) {
-    await log(err);
+    await log(`updateDriver error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -71,7 +70,7 @@ exports.deleteDriver = async (req, res) => {
       message: "Driver has been successfully deleted...",
     });
   } catch (err) {
-    await log(err);
+    await log(`deleteDriver error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -84,7 +83,7 @@ exports.getDriver = async (req, res) => {
       res.status(404).json("No driver was found with this id");
     }
   } catch (err) {
-    await log(err);
+    await log(`getDriver error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -102,7 +101,7 @@ exports.getAllDrivers = async (req, res) => {
       res.status(404).json("There are no drivers");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllDrivers error : ${err}`);
     res.status(500).json(err);
   }
 };

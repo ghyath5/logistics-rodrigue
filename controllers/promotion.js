@@ -72,8 +72,7 @@ exports.createpromotion = async (req, res) => {
     const savedPromotion = await newPromotion.save();
     return res.status(200).json({ success: true, data: savedPromotion });
   } catch (err) {
-    console.log("createpromotion err", err);
-    await log(err);
+    await log(`createpromotion error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -151,7 +150,7 @@ exports.updatePromotion = async (req, res) => {
       return res.status(404).json("No promotion was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`updatePromotion error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -177,8 +176,7 @@ exports.deletePromotion = async (req, res) => {
       res.status(200).json("Promotion has been deleted...");
     }
   } catch (err) {
-    await log(err);
-    console.log("deletePromotion error", err);
+    await log(`deletePromotion error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -205,8 +203,7 @@ exports.getPromotion = async (req, res) => {
       res.status(404).json("No promotion was found with this id !");
     }
   } catch (err) {
-    console.log("getPromotion err", err);
-    await log(err);
+    await log(`deletePromotion error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -240,7 +237,7 @@ exports.getAllPromotions = async (req, res) => {
       return res.status(200).json("No categories found");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllPromotions error : ${err}`);
     res.status(500).json(err);
   }
 };

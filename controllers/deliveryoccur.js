@@ -31,7 +31,6 @@ exports.createDeliveryOccur = async (req, res) => {
       );
     }
   } catch (err) {
-    console.log("createDeliveryOccur err", err);
     await log(`createDeliveryOccur error : ${err}`);
     res.status(500).json(err);
   }
@@ -53,7 +52,6 @@ exports.updateDeliveryOccur = async (req, res) => {
         .json("No delivery occur method was found by this id");
     }
   } catch (err) {
-    console.log("createDeliveryOccur err", err);
     await log(`createDeliveryOccur error : ${err}`);
     res.status(500).json(err);
   }
@@ -76,7 +74,7 @@ exports.deleteDeliveryOccur = async (req, res) => {
       message: "Delivery occur option has been successfully deleted...",
     });
   } catch (err) {
-    await log(err);
+    await log(`deleteDeliveryOccur error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -89,7 +87,7 @@ exports.getDeliveryOccur = async (req, res) => {
       res.status(404).json("No delivery occur method was found by this id");
     }
   } catch (err) {
-    await log(err);
+    await log(`getDeliveryOccur error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -109,7 +107,7 @@ exports.getAllDeliveryOccur = async (req, res) => {
       res.status(404).json("No delivery occur yet !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllDeliveryOccur error : ${err}`);
     res.status(500).json(err);
   }
 };

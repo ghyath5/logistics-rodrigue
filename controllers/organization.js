@@ -55,17 +55,14 @@ exports.createOrganization = async (req, res) => {
 
     res.status(200).json(savedOrganization);
   } catch (err) {
-    console.log("createOrganization err", err);
-    await log(err);
+    await log(`createOrganization error : ${err}`);
     res.status(500).json(err);
   }
 };
 exports.addCustomerToOrganization = async (req, res) => {
   try {
     const { customerId } = req.body;
-
     const customer = await Customer.findById(customerId);
-
     if (!customer)
       return res.status(404).json({
         success: false,
@@ -94,7 +91,8 @@ exports.addCustomerToOrganization = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log("addCustomerToOrganization err", err);
+    await log(`addCustomerToOrganization error : ${err}`);
+    res.status(500).json(err);
   }
 };
 exports.updateOrganization = async (req, res) => {
@@ -167,8 +165,7 @@ exports.updateOrganization = async (req, res) => {
       res.status(404).json("No organization was found with this id !");
     }
   } catch (err) {
-    console.log("updateOrganization err", err);
-    await log(err);
+    await log(`updateOrganization error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -192,8 +189,7 @@ exports.deleteOrganization = async (req, res) => {
     await Organization.findByIdAndDelete(req.params.id);
     res.status(200).json("Organization has been deleted...");
   } catch (err) {
-    console.log("deleteOrganization err", err);
-    await log(err);
+    await log(`deleteOrganization error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -212,7 +208,7 @@ exports.getOrganization = async (req, res) => {
       res.status(404).json("No organization was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getOrganization error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -232,7 +228,7 @@ exports.getAllOrganizations = async (req, res) => {
       return res.status(200).json("No organizations found");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllOrganizations error : ${err}`);
     res.status(500).json(err);
   }
 };

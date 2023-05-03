@@ -5,12 +5,12 @@ const Orders = require("../models/Orders");
 const Xero = require("../helpers/Xero");
 
 exports.createRun = async (req, res) => {
-  const newRun = new Run(req.body);
   try {
+    const newRun = new Run(req.body);
     const savedRun = await newRun.save();
     res.status(200).json(savedRun);
   } catch (err) {
-    await log(err);
+    await log(`createRun error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -51,7 +51,7 @@ exports.updateRun = async (req, res) => {
       res.status(404).json("No run was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`updateRun error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -60,7 +60,7 @@ exports.deleteRun = async (req, res) => {
     await Run.findByIdAndDelete(req.params.id);
     res.status(200).json("Run has been deleted...");
   } catch (err) {
-    await log(err);
+    await log(`deleteRun error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -80,7 +80,7 @@ exports.getRun = async (req, res) => {
       res.status(404).json("No run was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getRun error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -96,7 +96,8 @@ exports.getComingRuns = async (routeId) => {
       return [];
     }
   } catch (err) {
-    console.log("getComingRuns err", err);
+    await log(`getComingRuns error : ${err}`);
+    res.status(500).json(err);
   }
 };
 exports.getAllComingRuns = async () => {
@@ -104,8 +105,8 @@ exports.getAllComingRuns = async () => {
     const runs = await Run.find({ $or: [{ status: 0 }, { status: 1 }] });
     return runs || [];
   } catch (err) {
-    console.log("getComingRuns err", err);
     return [];
+    await log(`getAllComingRuns error : ${err}`);
   }
 };
 exports.getAllRuns = async (req, res) => {
@@ -127,7 +128,7 @@ exports.getAllRuns = async (req, res) => {
       return res.status(200).json("No runs found");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllRuns error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -165,8 +166,7 @@ exports.getRunPdf = async (req, res) => {
       res.status(404).json("No run was found with this id !");
     }
   } catch (err) {
-    //await log(err);
-    console.log("err", err.response);
-    res.status(500).json(err.response.body);
+    await log(`getRunPdf error : ${err}`);
+    res.status(500).json(err);
   }
 };

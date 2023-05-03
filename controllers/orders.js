@@ -101,44 +101,43 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
       data: products,
     });
   } catch (err) {
-    console.log("sendCustomeIdToCreateOrder err", err);
-    await log(err);
+    await log(`sendCustomeIdToCreateOrder error : ${err}`);
     res.status(500).json(err);
   }
 };
 exports.createOrder = async (req, res) => {
-  const createNewRun = async (orderDate, newOrder, customerRouteId) => {
-    const newRun = new Run({
-      date: orderDate,
-      orders: [newOrder],
-      route: customerRouteId,
-    });
-    const savedRun = await newRun.save();
-    return savedRun;
-  };
-
-  const updateCustomerOrdeCount = async (customer) => {
-    await Customer.findByIdAndUpdate(
-      customer,
-      {
-        $inc: { totalOrders: 1 },
-      },
-      { new: true }
-    );
-  };
-
-  const updateUserOrdeCount = async (user) => {
-    await User.findByIdAndUpdate(
-      user,
-      {
-        $inc: { ordersCount: 1 },
-      },
-      { new: true }
-    );
-  };
-  const { date, customer, products } = req.body;
-
   try {
+    const createNewRun = async (orderDate, newOrder, customerRouteId) => {
+      const newRun = new Run({
+        date: orderDate,
+        orders: [newOrder],
+        route: customerRouteId,
+      });
+      const savedRun = await newRun.save();
+      return savedRun;
+    };
+
+    const updateCustomerOrdeCount = async (customer) => {
+      await Customer.findByIdAndUpdate(
+        customer,
+        {
+          $inc: { totalOrders: 1 },
+        },
+        { new: true }
+      );
+    };
+
+    const updateUserOrdeCount = async (user) => {
+      await User.findByIdAndUpdate(
+        user,
+        {
+          $inc: { ordersCount: 1 },
+        },
+        { new: true }
+      );
+    };
+    const { date, customer, products } = req.body;
+
     const newOrder = new Order(req.body);
     let amount = 0;
     for (let j = 0; j < products.length; j++) {
@@ -200,8 +199,7 @@ exports.createOrder = async (req, res) => {
       return res.status(200).json({ message: "New run is created", ourRun });
     }
   } catch (err) {
-    console.log("createOrder err", err);
-    await log(err);
+    await log(`createOrder error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -229,8 +227,7 @@ exports.updateOrder = async (req, res) => {
       res.status(404).json("No order was found with this id !");
     }
   } catch (err) {
-    console.log("updateOrder err", err);
-    await log(err);
+    await log(`updateOrder error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -239,7 +236,7 @@ exports.deleteOrder = async (req, res) => {
     await Order.findByIdAndDelete(req.params.id);
     res.status(200).json("Order has been deleted...");
   } catch (err) {
-    await log(err);
+    await log(`deleteOrder error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -266,8 +263,7 @@ exports.getOrder = async (req, res) => {
       res.status(404).json("No order was found with this id !");
     }
   } catch (err) {
-    console.log("err", err);
-    await log(err);
+    await log(`getOrder error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -296,8 +292,7 @@ exports.getOrdersByDate = async (req, res) => {
       return res.status(200).json({ success: true, data: [] });
     }
   } catch (err) {
-    console.log("getOrdersByDate err", err);
-    await log(err);
+    await log(`getOrdersByDate error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -348,15 +343,14 @@ exports.getAllOrders = async (req, res) => {
       return res.status(200).json("No orders found");
     }
   } catch (err) {
-    console.log("err", err);
-    await log(err);
+    await log(`getAllOrders error : ${err}`);
     res.status(500).json(err);
   }
 };
 exports.searchOrderByProductText = async (req, res) => {
-  const { name } = req.query;
-  const isDate = moment(name, "", true).isValid();
   try {
+    const { name } = req.query;
+    const isDate = moment(name, "", true).isValid();
     let findQuery = {};
     if (!isDate) {
       const productsIDSQuery = await Products.find({
@@ -401,7 +395,8 @@ exports.searchOrderByProductText = async (req, res) => {
       .sort({ date: 1 });
     res.status(200).json(orders);
   } catch (err) {
-    console.log("searchOrderByProductText err", err);
+    await log(`searchOrderByProductText error : ${err}`);
+    res.status(500).json(err);
   }
 };
 exports.executeDeliveryOccur = async (req, res) => {
@@ -539,7 +534,8 @@ exports.executeDeliveryOccur = async (req, res) => {
     res.status(200).json({ orders: createdOrders }); //send created order to the client
     await Promise.all([Run.bulkWrite(bulkUpsertOps), Run.insertMany(inserts)]); // create or update Runs
   } catch (err) {
-    console.log("err", err);
+    await log(`executeDeliveryOccur error : ${err}`);
+    res.status(500).json(err);
   }
 };
 exports.exportOrdersAsExcelFile = async (req, res) => {
@@ -656,6 +652,8 @@ exports.exportOrdersAsExcelFile = async (req, res) => {
     });
     return wb.write("Orders.xlsx", res);
   } catch (e) {
+    await log(`exportOrdersAsExcelFile error : ${err}`);
+
     return res.status(400).json({ message: "cannot download the excel file" });
   }
 };

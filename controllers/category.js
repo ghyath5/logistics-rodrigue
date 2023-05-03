@@ -62,21 +62,10 @@ exports.deleteCategory = async (req, res) => {
 exports.getCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-    // const productCount = await Products.countDocuments({
-    //   categoryId: req.params.id,
-    // });
-
-    if (category) {
-      category.productCount = productCount;
-
-      res.status(200).json(category);
-    } else {
-      res.status(404).json("There is no category with this id");
-    }
+    if (category) return res.status(200).json(category);
+    return res.status(404).json("There is no category with this id");
   } catch (err) {
-    console.log("getCategory err", err);
     await log(`getCategory error : ${err}`);
-
     res.status(500).json(err);
   }
 };
@@ -95,7 +84,6 @@ exports.getAllCategories = async (req, res) => {
       return res.status(200).json("No categories found");
     }
   } catch (err) {
-    console.log("getAllCategories err", err);
     await log(`getAllCategories error : ${err}`);
     res.status(500).json(err);
   }

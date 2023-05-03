@@ -45,8 +45,7 @@ exports.createRoute = async (req, res) => {
 
     res.status(200).json(savedRoute);
   } catch (err) {
-    console.log("createRoute err", err);
-    await log(err);
+    await log(`createRoute error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -93,8 +92,7 @@ exports.updateRoute = async (req, res) => {
     }
     return res.status(200).json(updatedRoute);
   } catch (err) {
-    await log(err);
-    console.log("updateRoute err", err);
+    await log(`updateRoute error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -111,7 +109,7 @@ exports.deleteRoute = async (req, res) => {
     await Route.findByIdAndDelete(req.params.id);
     res.status(200).json("Route has been deleted...");
   } catch (err) {
-    await log(err);
+    await log(`deleteRoute error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -124,7 +122,7 @@ exports.getRouteRoute = async (req, res) => {
       res.status(404).json("No route was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getRouteRoute error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -142,7 +140,7 @@ exports.getAllRoutes = async (_req, res) => {
       return res.status(200).json("No routes found");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllRoutes error : ${err}`);
     res.status(500).json(err);
   }
 };

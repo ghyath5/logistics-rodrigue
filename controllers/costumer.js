@@ -67,15 +67,13 @@ exports.createCostumer = async (req, res) => {
       { new: true }
     );
   } catch (err) {
-    console.log("createCustomer err", err);
     await log(`createCustomer error : ${err}`);
     res.status(500).json(err);
   }
 };
 exports.updateCostumer = async (req, res) => {
-  const { businessname, abn } = req.body;
-
   try {
+    const { businessname, abn } = req.body;
     const existsBusinessName = await Customer.findOne({
       businessname,
       _id: { $ne: req.params.id },
@@ -134,7 +132,6 @@ exports.updateCostumer = async (req, res) => {
     }
   } catch (err) {
     await log(`updateCostumer error : ${err}`);
-    console.log("updateCostumer err", err);
     res.status(500).json(err);
   }
 };
@@ -180,7 +177,6 @@ exports.deleteCostumer = async (req, res) => {
     });
   } catch (err) {
     await log(`deleteCostumer error : ${err}`);
-    console.log("deleteCostumer err", err);
     res.status(500).json(err);
   }
 };
@@ -197,7 +193,6 @@ exports.getCostumer = async (req, res) => {
     }
   } catch (err) {
     await log(`getCostumer error : ${err}`);
-    console.log("getCostumer err", err);
     res.status(500).json(err);
   }
 };
@@ -211,7 +206,7 @@ exports.getCostumerInternally = async (customerId) => {
     }
   } catch (err) {
     await log(`getCostumerInternally error : ${err}`);
-    console.log("getCostumerInternally err", err);
+    res.status(500).json(err);
   }
 };
 exports.getCostumerPaginatedArchived = async (req, res) => {
@@ -235,13 +230,12 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
     res.status(200).json({ customerCount, customers });
   } catch (err) {
     await log(`getCostumerPaginatedArchived error : ${err}`);
-    console.log("getCostumerPaginatedArchived err", err);
     res.status(500).json(err);
   }
 };
 exports.findCustomerByTextSearch = async (req, res) => {
-  const { find, page, limit } = req.query;
   try {
+    const { find, page, limit } = req.query;
     const found = await Customer.find({
       $or: [
         { codeid: { $regex: find, $options: "i" } },
@@ -257,7 +251,6 @@ exports.findCustomerByTextSearch = async (req, res) => {
     return res.status(200).json(found);
   } catch (err) {
     await log(`findCustomerByTextSearch error : ${err}`);
-    console.log("findCustomerByTextSearch err", err);
     res.status(500).json(err);
   }
 };
@@ -350,7 +343,6 @@ exports.getTopCustomers = async (req, res) => {
     });
   } catch (err) {
     await log(`getTopCustomers error : ${err}`);
-    console.log("getTopCustomers err", err);
     res.status(500).json(err);
   }
 };
@@ -401,7 +393,6 @@ exports.getCustomersToCall = async (req, res) => {
     res.status(200).json(customers);
   } catch (err) {
     await log(`getCustomersToCall error : ${err}`);
-    console.log("getCustomersToCall err", err);
     res.status(500).json(err);
   }
 };
@@ -417,7 +408,6 @@ exports.toggleCall = async (req, res) => {
     res.status(200).json(customer);
   } catch (err) {
     await log(`toggleCall error : ${err}`);
-    console.log("toggleCall err", err);
     res.status(500).json(err);
   }
 };
@@ -460,7 +450,6 @@ exports.getAllNonOrganizationalCustomers = async (req, res) => {
     }
   } catch (err) {
     await log(`getAllNonOrganizationalCustomers error : ${err}`);
-    console.log("getAllNonOrganizationalCustomers err", err);
     res.status(500).json(err);
   }
 };

@@ -4,50 +4,51 @@ const User = require("../models/User");
 const { log } = require("../helpers/Loger");
 
 exports.signup = async (req, res) => {
-  const { name, email, phonenumber, username, role } = req.body;
-
-  //check if email is duplicate
-  const emailUser = await User.findOne({ email });
-  if (emailUser) {
-    return res.status(400).json({
-      success: false,
-      message: "This email is already in use, try sign-in with a different one",
-    });
-  }
-
-  //check if name is duplicate
-  const nameUser = await User.findOne({ name });
-  if (nameUser) {
-    return res.status(400).json({
-      success: false,
-      message: "This name is already in use, try sign-in with a different one",
-    });
-  }
-
-  //check if phonenumber is duplicate
-  const phonenumberUser = await User.findOne({ phonenumber });
-  if (phonenumberUser) {
-    return res
-      .status(399)
-      .json({ success: false, message: "This phone number already exists" });
-  }
-
-  const newUser = new User({
-    name,
-    username,
-    email,
-    phonenumber,
-    role,
-    password: CryptoJS.AES.encrypt(
-      req.body.password,
-      process.env.PASS_SEC
-    ).toString(),
-  });
   try {
+    const { name, email, phonenumber, username, role } = req.body;
+
+    //check if email is duplicate
+    const emailUser = await User.findOne({ email });
+    if (emailUser) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This email is already in use, try sign-in with a different one",
+      });
+    }
+
+    //check if name is duplicate
+    const nameUser = await User.findOne({ name });
+    if (nameUser) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This name is already in use, try sign-in with a different one",
+      });
+    }
+
+    //check if phonenumber is duplicate
+    const phonenumberUser = await User.findOne({ phonenumber });
+    if (phonenumberUser) {
+      return res
+        .status(399)
+        .json({ success: false, message: "This phone number already exists" });
+    }
+
+    const newUser = new User({
+      name,
+      username,
+      email,
+      phonenumber,
+      role,
+      password: CryptoJS.AES.encrypt(
+        req.body.password,
+        process.env.PASS_SEC
+      ).toString(),
+    });
     let savedUser = await newUser.save();
     res.status(200).json(savedUser);
   } catch (err) {
-    console.log("signUp err", err);
     await log(`signUp error : ${err}`);
     res.status(500).json(err);
   }
@@ -93,7 +94,6 @@ exports.login = async (req, res) => {
     const { password, ...others } = user._doc;
     return res.status(200).json({ ...others, accessToken });
   } catch (err) {
-    console.log("login err", err);
     await log(`login error : ${err}`);
     res.status(500).json(err);
   }

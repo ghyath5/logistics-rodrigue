@@ -21,8 +21,7 @@ exports.getSalesByDay = async (req, res) => {
     }
     res.status(200).json({ success: true, totalIncome });
   } catch (err) {
-    console.log("getSalesByDay err", err);
-    await log(err);
+    await log(`getSalesByDay error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -38,8 +37,7 @@ exports.getOrdersByUserId = async (req, res) => {
 
     res.status(200).json({ success: true, totalIncome, orders });
   } catch (err) {
-    console.log("getOrdersByUserId err", err);
-    await log(err);
+    await log(`getOrdersByUserId error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -60,8 +58,7 @@ exports.getSalesMonth = async (req, res) => {
     }
     res.status(200).json({ success: true, totalIncome });
   } catch (err) {
-    console.log("getSalesMonth err", err);
-    await log(err);
+    await log(`getSalesMonth error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -117,8 +114,7 @@ exports.getSalesByDateRange = async (req, res) => {
 
     res.status(200).json({ labels, dataset1, dataset2 });
   } catch (err) {
-    console.log("getSalesByDateRange err", err);
-    await log(err);
+    await log(`getSalesByDateRange error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -135,6 +131,7 @@ exports.getSalesPerUser = async (req, res) => {
       ]);
     }
   } catch (err) {
-    console.log("err", err);
+    await log(`getSalesPerUser error : ${err}`);
+    res.status(500).json(err);
   }
 };

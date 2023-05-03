@@ -3,7 +3,6 @@ const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
 const Sharedrecords = require("../models/Sharedrecords");
 const Category = require("../models/Category");
-
 const { default: mongoose } = require("mongoose");
 
 const XeroHelper = require("../helpers/Xero");
@@ -11,12 +10,12 @@ const XeroHelper = require("../helpers/Xero");
 exports.createproduct = async (req, res) => {
   const { name, assignedCode } = req.body;
 
-  if (!name || !assignedCode) {
-    return res.status(400).json("Please fill in all the fields");
-  } else {
-    const newProduct = new Products(req.body);
+  try {
+    if (!name || !assignedCode) {
+      return res.status(400).json("Please fill in all the fields");
+    } else {
+      const newProduct = new Products(req.body);
 
-    try {
       const isNewProductCode = await Products.findOne({ assignedCode });
       if (isNewProductCode)
         return res.status(400).json({
@@ -51,11 +50,10 @@ exports.createproduct = async (req, res) => {
           $inc: { productcodeid: 1 },
         });
       }
-    } catch (err) {
-      console.log(err);
-      await log(err);
-      res.status(500).json(err);
     }
+  } catch (err) {
+    await log(`createproduct error : ${err}`);
+    res.status(500).json(err);
   }
 };
 exports.updateProduct = async (req, res) => {
@@ -95,8 +93,7 @@ exports.updateProduct = async (req, res) => {
       res.status(404).json("No product was found with this id !");
     }
   } catch (err) {
-    console.log("updateProduct err", err);
-    await log(err);
+    await log(`updateProduct error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -137,7 +134,7 @@ exports.deleteProduct = async (req, res) => {
       message: "This Product is successfully deleted",
     });
   } catch (err) {
-    await log(err);
+    await log(`deleteProduct error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -152,7 +149,7 @@ exports.getProduct = async (req, res) => {
       return res.status(404).json("No product was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getProduct error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -181,7 +178,7 @@ exports.getproductsPaginated = async (req, res) => {
       .status(200)
       .json({ productsCount, hiddenProducts, visibleProducts, products });
   } catch (err) {
-    await log(err);
+    await log(`getproductsPaginated error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -200,8 +197,7 @@ exports.findProductsByTextSearch = async (req, res) => {
     if (!found) return res.status(404).json("No Products were found");
     return res.status(200).json(found);
   } catch (err) {
-    console.log("err", err);
-    await log(err);
+    await log(`findProductsByTextSearch error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -240,7 +236,7 @@ exports.getTopOrderedProducts = async (req, res) => {
     const ordersQuantity = topProducts.map((prod) => prod.totalOrdersQuantity);
     res.json({ data: ordersQuantity, labels: names });
   } catch (err) {
-    await log(err);
+    await log(`getTopOrderedProducts error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -332,7 +328,7 @@ exports.getTopProductsByCategory = async (req, res) => {
     });
     res.json(response);
   } catch (err) {
-    await log(err);
+    await log(`getTopProductsByCategory error : ${err}`);
     res.status(500).json(err);
   }
 };

@@ -54,18 +54,14 @@ exports.changePassword = async (req, res) => {
 
     if (!oldPassword || !newPassword)
       return res.status(400).json("Please fill all the fields");
-
     const hashedPassword = CryptoJS.AES.decrypt(
       user.password,
       process.env.PASS_SEC
     );
-
     const originalPassword = hashedPassword.toString(CryptoJS.enc.Utf8);
-
     if (originalPassword != oldPassword) {
       return res.status(400).json("Wrong password");
     }
-
     await User.findByIdAndUpdate(
       id,
       {
@@ -77,7 +73,7 @@ exports.changePassword = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Password changed successfully",
     });
   } catch (err) {

@@ -16,7 +16,7 @@ exports.createVehicle = async (req, res) => {
     const savedVehicle = await newVehicle.save();
     res.status(201).json(savedVehicle);
   } catch (err) {
-    await log(err);
+    await log(`createVehicle error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -35,7 +35,7 @@ exports.updateVehicle = async (req, res) => {
       res.status(404).json("No vehicle was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`updateVehicle error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -56,7 +56,7 @@ exports.deleteVehicle = async (req, res) => {
       message: "Run has been successfully deleted...",
     });
   } catch (err) {
-    await log(err);
+    await log(`deleteVehicle error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -69,7 +69,7 @@ exports.getVehicle = async (req, res) => {
       res.status(404).json("No vehicle was found with this id !");
     }
   } catch (err) {
-    await log(err);
+    await log(`getVehicle error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -87,7 +87,7 @@ exports.getAllVehicles = async (req, res) => {
       return res.status(200).json("No vehicles found");
     }
   } catch (err) {
-    await log(err);
+    await log(`getAllVehicles error : ${err}`);
     res.status(500).json(err);
   }
 };
