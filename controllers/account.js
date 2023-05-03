@@ -40,7 +40,6 @@ exports.getAccount = async (req, res) => {
       user: others,
     });
   } catch (err) {
-    console.log("getAccount", err);
     await log(`getAccount error : ${err}`);
     res.status(500).json(err);
   }
@@ -82,8 +81,7 @@ exports.changePassword = async (req, res) => {
       message: "Password changed successfully",
     });
   } catch (err) {
-    console.log("changePassword", err);
-    await log(`change password error : ${err}`);
+    await log(`changePassword error : ${err}`);
     res.status(500).json(err);
   }
 };
