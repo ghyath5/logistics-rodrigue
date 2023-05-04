@@ -653,7 +653,6 @@ exports.exportOrdersAsExcelFile = async (req, res) => {
     return wb.write("Orders.xlsx", res);
   } catch (e) {
     await log(`exportOrdersAsExcelFile error : ${err}`);
-
     return res.status(400).json({ message: "cannot download the excel file" });
   }
 };
