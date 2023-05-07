@@ -4,12 +4,10 @@ const {
   getAllUsers,
   getAllStaff,
 } = require("../controllers/getPeople");
-const {
-  verifyUpperAdmin,
-} = require("../middlewares/verifyToken");
+const { verifyUpperAdmin, verifyToken } = require("../middlewares/verifyToken");
 
-router.route("/admins").get(verifyUpperAdmin, getAllAdmins);
-router.route("/users").get(verifyUpperAdmin, getAllUsers);
-router.route("/staffmembers").get(verifyUpperAdmin, getAllStaff);
+router.route("/admins").get(verifyToken, verifyUpperAdmin, getAllAdmins);
+router.route("/users").get(verifyToken, verifyUpperAdmin, getAllUsers);
+router.route("/staffmembers").get(verifyToken, verifyUpperAdmin, getAllStaff);
 
 module.exports = router;

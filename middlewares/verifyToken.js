@@ -40,20 +40,10 @@ const verifyTokenAndAdmin = (req, res, next) => {
 };
 
 const verifyUpperAdmin = (req, res, next) => {
-  let token = req.headers.token;
-  if (!token) return res.status(404).json("Only admins can do that !");
-
-  verifyToken(req, res, () => {
-    if (
-      req.user.role &&
-      req.user.role == 1 &&
-      req.user.id.toString() === process.env.UPPER_ADMIN_ID
-    ) {
-      next();
-    } else {
-      res.status(403).json("Only admins can do such operations!");
-    }
-  });
+  if (!req.user.isUpperAdmin) {
+    return res.status(403).json("Only upper admin can do such operations!");
+  }
+  next();
 };
 
 module.exports = {
