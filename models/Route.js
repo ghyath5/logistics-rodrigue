@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const RouteSchema = new mongoose.Schema(
   {
+    xeroid: { type: String, unique: true },
     name: { type: String },
     description: { type: String },
     from: { type: String },

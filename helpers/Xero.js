@@ -5,6 +5,7 @@ const Sharedrecords = require("../models/Sharedrecords");
 const Product = require("../models/Products");
 const Order = require("../models/Orders");
 const Organization = require("../models/Organization");
+const Route = require("../models/Route");
 
 require("dotenv").config();
 
@@ -274,6 +275,151 @@ const synchAllProductsToXero = async () => {
   }
 };
 
+const synchContactGroupToXero = async (route) => {
+  const xeroId = route.xeroid ? route.xeroid : "";
+  await xero.getClientCredentialsToken();
+
+  const groups = xeroId
+    ? await xero.accountingApi.getContactGroups("", xeroId)
+    : { body: { contactGroups: [] } };
+
+  const addUpdateFields = {
+    name: route.name,
+    status: route.isarchived ? "ARCHIVED" : "ACTIVE",
+  };
+
+  if (groups.body.contactGroups.length === 0) {
+    // create
+    const groups = await xero.accountingApi.createContactGroups(
+      "",
+      {
+        contactGroups: [addUpdateFields],
+      },
+      summarizeErrors
+    );
+
+    // update route xeroid
+    await Route.findByIdAndUpdate(route._id, {
+      xeroid: groups.body.contactGroups[0].contactGroupID,
+    });
+
+    console.log("Xero Contact Group created successfully");
+  } else {
+    // update
+    await xero.accountingApi.updateContactGroup(
+      "",
+      groups.body.contactGroups[0].contactGroupID,
+      {
+        contactGroups: [addUpdateFields],
+      },
+      summarizeErrors
+    );
+    console.log("Xero Contact Group updated successfully");
+  }
+};
+
+const synchContactGroupFromXero = async (groupId) => {
+  await xero.getClientCredentialsToken();
+  const groups = await xero.accountingApi.getContactGroup("", groupId);
+  const group = groups.body.contactGroups[0];
+
+  if (!group) return;
+
+  const route = await Route.findOne({
+    xeroid: groupId,
+  });
+
+  const addUpdateFields = {
+    name: group.name,
+    isarchived: group.status === "ARCHIVED",
+  };
+
+  if (route) {
+    // update route
+    await route.updateOne(addUpdateFields);
+    console.log("Route updated successfully");
+  } else {
+    // create route
+    await Route.create({
+      ...addUpdateFields,
+      xeroid: groupId,
+    });
+    console.log("Route created successfully");
+  }
+};
+
+const synchAllContactGroupsFromXero = async () => {
+  await xero.getClientCredentialsToken();
+
+  const groups = await xero.accountingApi.getContactGroups("");
+  const groupList = groups.body.contactGroups;
+
+  for (let i = 0; i < groupList.length; i++) {
+    await synchContactGroupFromXero(groupList[i].contactGroupID);
+  }
+
+  console.log("All Contact Groups synched successfully");
+};
+
+const removeContactFromGroupXero = async (contactId, groupId) => {
+  await xero.getClientCredentialsToken();
+
+  await xero.accountingApi.deleteContactGroupContact(
+    "",
+    groupId,
+    contactId,
+    summarizeErrors
+  );
+
+  console.log("Contact removed from group successfully");
+};
+
+const removeAllContactsFromGroupXero = async (groupId) => {
+  await xero.getClientCredentialsToken();
+  await xero.accountingApi.deleteContactGroupContacts(
+    "",
+    groupId,
+    summarizeErrors
+  );
+  console.log("All Contacts removed from group successfully");
+};
+
+const addContactToGroupXero = async (contactId, groupId) => {
+  await xero.getClientCredentialsToken();
+
+  await xero.accountingApi.createContactGroupContacts(
+    "",
+    groupId,
+    {
+      contacts: [
+        {
+          contactID: contactId,
+        },
+      ],
+    },
+    summarizeErrors
+  );
+
+  console.log("Contact added to group successfully");
+};
+
+const addContactsToGroupXero = async (xeroIds, groupId) => {
+  await xero.getClientCredentialsToken();
+
+  await xero.accountingApi.createContactGroupContacts(
+    "",
+    groupId,
+    {
+      contacts: xeroIds.map((xeroId) => ({
+        contactID: xeroId,
+      })),
+    },
+    summarizeErrors
+  );
+
+  console.log("Contacts added to group successfully");
+};
+
 const createInvoice = async (orderId) => {
   const order = await Order.findById(orderId)
     .populate("customer products.product")
@@ -406,6 +552,64 @@ const getInvoiceAsPdf = async (orderId) => {
 //     console.log(err);
 //   });
 
+// synchAllContactGroupsFromXero().catch((err) => {
+//   console.log(err);
+// });
+
+// xeroid: 60d578d9-3e10-4aef-b5dc-9d9fd60a3633
+// groupid: bc3959ff-c1c9-4b97-b2ee-4a733be61a64
+
+// addContactToGroupXero(
+//   "60d578d9-3e10-4aef-b5dc-9d9fd60a3633",
+//   "bc3959ff-c1c9-4b97-b2ee-4a733be61a64"
+// ).catch((err) => {
+//   console.log(JSON.stringify(err.response.body, null, 2));
+// });
+
+// addContactsToGroupXero(
+//   [
+//     "4e2f192e-8397-4d4d-97ca-a4fc5ac531bf",
+//     "60d578d9-3e10-4aef-b5dc-9d9fd60a3633",
+//   ],
+//   "bc3959ff-c1c9-4b97-b2ee-4a733be61a64"
+// ).catch((err) => {
+//   console.log(JSON.stringify(err.response.body, null, 2));
+// });
+
+const resynchContactGroupContactsToXero = async (routeId) => {
+  const route = await Route.findById(routeId);
+  const contacts = route.customers.map((customer) => customer.xeroid);
+
+  await removeAllContactsFromGroupXero(route.xeroid);
+  await addContactsToGroupXero(contacts, route.xeroid);
+
+  console.log("Group Contacts resynched successfully");
+};
+
+const resynchContactGroupContactsFromXero = async (groupId) => {
+  const route = await Route.findOne({ xeroid: groupId });
+  const xeroIds = await getContactsFromGroupXero(groupId).map(
+    (contact) => contact.contactID
+  );
+  const customers = await Customer.find({ xeroid: { $in: xeroIds } });
+  await Route.findByIdAndUpdate(route._id, {
+    customers: customers.map((customer) => customer._id),
+  });
+  await Customer.updateMany({ xeroid: { $in: xeroIds } }, { route: route._id });
+  console.log("Group Contacts resynched successfully");
+};
+
+const getContactsFromGroupXero = async (groupId) => {
+  const res = await xero.accountingApi.getContactGroup("", groupId);
+  return res.body.contactGroups[0].contacts;
+};
+
+removeAllContactsFromGroupXero("bc3959ff-c1c9-4b97-b2ee-4a733be61a64").catch(
+  (err) => {
+    console.log(JSON.stringify(err.response.body, null, 2));
+  }
+);
+
 module.exports = {
   createCustomers,
   getCustomer,
@@ -418,4 +622,9 @@ module.exports = {
   synchAllProductsFromXero,
   synchAllCustomersFromXero,
   synchAllProductsToXero,
+  synchContactGroupFromXero,
+  synchContactGroupToXero,
+  synchAllContactGroupsFromXero,
+  removeContactFromGroupXero,
+  addContactToGroupXero,
 };
