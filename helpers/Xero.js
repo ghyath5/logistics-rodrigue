@@ -679,13 +679,13 @@ const initialSync = async () => {
   await synchAllCustomersFromXero();
 };
 
-initialSync()
-  .then(() => {
-    console.log("Initial Sync completed successfully");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+// initialSync()
+//   .then(() => {
+//     console.log("Initial Sync completed successfully");
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 module.exports = {
   createCustomers,
