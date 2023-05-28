@@ -112,17 +112,29 @@ exports.updateCostumer = async (req, res) => {
           $unset: { "sheduledCall.date": 1 },
         });
       }
-      const route = await Route.findOne({ customers: req.params.id });
-      if (
-        route &&
-        route._id.toString() !== updatedCustomer.routeId.toString()
-      ) {
-        await Route.findByIdAndUpdate(route._id, {
-          $pull: { customers: req.params.id },
-        });
+
+      const oldRoute = await Route.findOne({ customers: req.params.id });
+      const newRoute = await Route.findById(updatedCustomer.routeId);
+      if (updatedCustomer.routeId) {
         await Route.findByIdAndUpdate(updatedCustomer.routeId, {
           $push: { customers: req.params.id },
         });
+        await XeroHelper.addContactToGroupXero(
+          updatedCustomer.xeroid,
+          newRoute.xeroid
+        );
+      }
+      if (
+        oldRoute &&
+        oldRoute._id.toString() !== updatedCustomer.routeId.toString()
+      ) {
+        await Route.findByIdAndUpdate(oldRoute._id, {
+          $pull: { customers: req.params.id },
+        });
+        await XeroHelper.removeContactFromGroupXero(
+          updatedCustomer.xeroid,
+          oldRoute.xeroid
+        );
       }
 
       await XeroHelper.synchCustomerToXero(updatedCustomer);

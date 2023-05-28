@@ -39,12 +39,22 @@ const createCustomers = async () => {
 };
 
 const synchCustomerToXero = async (customer) => {
+  console.log("synchCustomerToXero");
   const xeroId = customer.xeroid ? customer.xeroid : "";
 
   await xero.getClientCredentialsToken();
-  const contacts = xeroId
-    ? await xero.accountingApi.getContact("", xeroId)
-    : { body: { contacts: [] } };
+  // const contacts = xeroId
+  //   ? await xero.accountingApi.getContact("", xeroId)
+  //   : { body: { contacts: [] } };
+
+  let contacts = { body: { contacts: [] } };
+  if (xeroId) {
+    try {
+      contacts = await xero.accountingApi.getContact("", xeroId);
+    } catch (error) {
+      // do nothing
+    }
+  }
 
   const addUpdateFields = {
     name: customer.businessname,
@@ -77,7 +87,6 @@ const synchCustomerToXero = async (customer) => {
     addUpdateFields.contactGroups = [];
   }
 
-  console.log(contacts.body.contacts);
   if (contacts.body.contacts.length === 0) {
     const contacts = await xero.accountingApi.createContacts(
       "",
@@ -215,9 +224,18 @@ const synchProductToXero = async (product) => {
   const xeroId = product.xeroid ? product.xeroid : "";
 
   await xero.getClientCredentialsToken();
-  const items = xeroId
-    ? await xero.accountingApi.getItem("", xeroId)
-    : { body: { items: [] } };
+  // const items = xeroId
+  //   ? await xero.accountingApi.getItem("", xeroId)
+  //   : { body: { items: [] } };
+
+  let items = { body: { items: [] } };
+  if (xeroId) {
+    try {
+      items = await xero.accountingApi.getItem("", xeroId);
+    } catch (err) {
+      // do nothing
+    }
+  }
 
   const addUpdateFields = {
     code: product.assignedCode,

@@ -136,7 +136,19 @@ exports.createOrder = async (req, res) => {
         { new: true }
       );
     };
-    const { date, customer, products } = req.body;
+    const { date, customer, products, isBackOrder } = req.body;
+
+    const ourCustomer = await getCostumerInternally(customer);
+
+    if (!ourCustomer)
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
+
+    if (!ourCustomer.routeId && !isBackOrder)
+      return res
+        .status(400)
+        .json({ success: false, message: "Customer doesn't have a route" });
 
     const newOrder = new Order(req.body);
     let amount = 0;
@@ -145,22 +157,12 @@ exports.createOrder = async (req, res) => {
       let pricePerUnit = products[j].pricePerUnit;
       amount = quantity * pricePerUnit + amount;
     }
-    let ourCustomer = await getCostumerInternally(customer);
+
     newOrder.totalamount = amount + ourCustomer.deliveryfee;
     newOrder.initiateduser = req.user.id.toString();
     await newOrder.save();
     updateCustomerOrdeCount(customer);
     updateUserOrdeCount(req.user.id.toString());
-
-    if (!ourCustomer)
-      return res
-        .status(404)
-        .json({ success: false, message: "Customer not found" });
-
-    if (ourCustomer.routeId == null)
-      return res
-        .status(400)
-        .json({ success: false, message: "Customer doesn't have a route" });
 
     if (newOrder.isBackOrder) {
       const pdf = await Xero.getInvoiceAsPdf(newOrder._id);
