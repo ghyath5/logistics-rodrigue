@@ -38,11 +38,6 @@ const createCustomers = async () => {
   });
 };
 
-const getCustomer = async (contactId) => {
-  await xero.getClientCredentialsToken();
-  const contacts = await xero.accountingApi.getContact("", contactId);
-};
-
 const synchCustomerToXero = async (customer) => {
   const xeroId = customer.xeroid ? customer.xeroid : "";
 
@@ -70,6 +65,18 @@ const synchCustomerToXero = async (customer) => {
     accountNumber: customer.abn,
     contactStatus: customer.isarchived ? "ARCHIVED" : "ACTIVE",
   };
+
+  if (customer.routeId) {
+    const route = await Route.findById(customer.routeId);
+    addUpdateFields.contactGroups = [
+      {
+        contactGroupID: route?.xeroid,
+      },
+    ];
+  } else {
+    addUpdateFields.contactGroups = [];
+  }
+
   console.log(contacts.body.contacts);
   if (contacts.body.contacts.length === 0) {
     const contacts = await xero.accountingApi.createContacts(
@@ -124,6 +131,36 @@ const synchCustomerFromXero = async (contactId) => {
     isarchived: contact.contactStatus === "ARCHIVED",
   };
 
+  const groupId = contact.contactGroups[0]?.contactGroupID;
+  const route = groupId
+    ? await Route.findOne({
+        xeroid: groupId,
+      })
+    : null;
+
+  let finalCustomer = customer;
+  let finalRoute = route;
+
+  if (contact.contactGroups.length > 0) {
+    if (route) {
+      addUpdateFields.routeId = route._id;
+    } else {
+      const groups = await xero.accountingApi.getContactGroup("", groupId);
+      const group = groups.body.contactGroups[0];
+      if (group) {
+        finalRoute = await Route.create({
+          name: group.name,
+          xeroid: group.contactGroupID,
+        });
+        addUpdateFields.routeId = finalRoute._id;
+      }
+
+      console.log("Route created successfully");
+    }
+  } else {
+    addUpdateFields.routeId = null;
+  }
+
   if (customer) {
     await customer.updateOne(addUpdateFields);
     console.log("Customer updated successfully");
@@ -137,7 +174,7 @@ const synchCustomerFromXero = async (contactId) => {
     while (codeid.length < 4) {
       codeid = "0" + codeid;
     }
-    await Customer.create({
+    finalCustomer = await Customer.create({
       ...addUpdateFields,
       codeid: codeid,
       xeroid: contactId,
@@ -145,6 +182,16 @@ const synchCustomerFromXero = async (contactId) => {
     codeSequence.customercodeid = codeSequence.customercodeid + 1;
     await codeSequence.save();
     console.log("Customer created successfully");
+  }
+
+  if (finalRoute) {
+    if (!finalRoute.customers) finalRoute.customers = [];
+
+    if (!finalRoute.customers.includes(finalCustomer._id)) {
+      finalRoute.customers.push(finalCustomer._id);
+      await finalRoute.save();
+      console.log("Customer added to route successfully");
+    }
   }
 };
 
@@ -154,8 +201,13 @@ const synchAllCustomersFromXero = async () => {
   const contacts = await xero.accountingApi.getContacts("");
   const contactList = contacts.body.contacts;
 
-  for (let i = 0; i < contactList.length; i++) {
-    await synchCustomerFromXero(contactList[i].contactID);
+  // only synch active customers
+  const activeContacts = contactList.filter((contact) => {
+    return contact.contactStatus === "ACTIVE";
+  });
+
+  for (let i = 0; i < activeContacts.length; i++) {
+    await synchCustomerFromXero(activeContacts[i].contactID);
   }
 };
 
@@ -233,7 +285,7 @@ const synchProductFromXero = async (productId) => {
   if (product) {
     // update product
     await product.updateOne(addUpdateFields);
-    // console.log("Product updated successfully");
+    console.log("Product updated successfully");
   } else {
     // create product
     const codeSequence = await Sharedrecords.findById(
@@ -261,8 +313,16 @@ const synchAllProductsFromXero = async () => {
   const items = await xero.accountingApi.getItems("");
   const itemList = items.body.items;
 
-  for (let i = 0; i < itemList.length; i++) {
-    await synchProductFromXero(itemList[i].itemID);
+  // // only synch active products
+  // const activeItems = itemList.filter((item) => {
+  //   return item.status === "ACTIVE";
+  // });
+
+  // for now, synch all products
+  const activeItems = itemList;
+
+  for (let i = 0; i < activeItems.length; i++) {
+    await synchProductFromXero(activeItems[i].itemID);
   }
 };
 
@@ -275,7 +335,8 @@ const synchAllProductsToXero = async () => {
   }
 };
 
-const synchContactGroupToXero = async (route) => {
+const synchContactGroupToXero = async (routeId) => {
+  const route = await Route.findById(routeId);
   const xeroId = route.xeroid ? route.xeroid : "";
   await xero.getClientCredentialsToken();
 
@@ -290,7 +351,7 @@ const synchContactGroupToXero = async (route) => {
 
   if (groups.body.contactGroups.length === 0) {
     // create
-    const groups = await xero.accountingApi.createContactGroups(
+    const groups = await xero.accountingApi.createContactGroup(
       "",
       {
         contactGroups: [addUpdateFields],
@@ -354,8 +415,11 @@ const synchAllContactGroupsFromXero = async () => {
   const groups = await xero.accountingApi.getContactGroups("");
   const groupList = groups.body.contactGroups;
 
-  for (let i = 0; i < groupList.length; i++) {
-    await synchContactGroupFromXero(groupList[i].contactGroupID);
+  // only sync active groups
+  const activeGroups = groupList.filter((group) => group.status === "ACTIVE");
+
+  for (let i = 0; i < activeGroups.length; i++) {
+    await synchContactGroupFromXero(activeGroups[i].contactGroupID);
   }
 
   console.log("All Contact Groups synched successfully");
@@ -604,15 +668,27 @@ const getContactsFromGroupXero = async (groupId) => {
   return res.body.contactGroups[0].contacts;
 };
 
-removeAllContactsFromGroupXero("bc3959ff-c1c9-4b97-b2ee-4a733be61a64").catch(
-  (err) => {
-    console.log(JSON.stringify(err.response.body, null, 2));
-  }
-);
+// removeAllContactsFromGroupXero("bc3959ff-c1c9-4b97-b2ee-4a733be61a64").catch(
+//   (err) => {
+//     console.log(JSON.stringify(err.response.body, null, 2));
+//   }
+// );
+
+const initialSync = async () => {
+  await synchAllProductsFromXero();
+  await synchAllCustomersFromXero();
+};
+
+initialSync()
+  .then(() => {
+    console.log("Initial Sync completed successfully");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 module.exports = {
   createCustomers,
-  getCustomer,
   synchCustomerToXero,
   synchCustomerFromXero,
   synchProductToXero,
@@ -627,4 +703,6 @@ module.exports = {
   synchAllContactGroupsFromXero,
   removeContactFromGroupXero,
   addContactToGroupXero,
+  resynchContactGroupContactsToXero,
+  resynchContactGroupContactsFromXero,
 };

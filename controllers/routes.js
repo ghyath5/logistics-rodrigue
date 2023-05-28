@@ -3,6 +3,8 @@ const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
 const mongoose = require("mongoose");
 
+const Xero = require("../helpers/Xero");
+
 exports.createRoute = async (req, res) => {
   const { name } = req.body;
   const newRoute = new Route(req.body);
@@ -14,39 +16,45 @@ exports.createRoute = async (req, res) => {
         .json({ success: false, message: "The route name already exists" });
     }
 
-    // const { customers } = req.body;
-    // if (customers) {
-    //   for (let i = 0; i < customers.length; i++) {
-    //     const customer = await Customer.findById(customers[i]);
-    //     if (!customer) {
-    //       return res.status(400).json({
-    //         success: false,
-    //         message: `Customer with id ${customers[i]} does not exist`,
-    //       });
-    //     }
+    const { customers } = req.body;
+    if (customers) {
+      for (let i = 0; i < customers.length; i++) {
+        const customer = await Customer.findById(customers[i]);
+        if (!customer) {
+          return res.status(400).json({
+            success: false,
+            message: `Customer with id ${customers[i]} does not exist`,
+          });
+        }
 
-    //     const route = await Route.findOne({ customers: customers[i] });
-    //     if (route) {
-    //       return res.status(400).json({
-    //         success: false,
-    //         message: `${customer.businessname} is already assigned to route ${route.name}`,
-    //       });
-    //     }
-    //   }
-    // }
+        const route = await Route.findOne({ customers: customers[i] });
+        if (route) {
+          return res.status(400).json({
+            success: false,
+            message: `${customer.businessname} is already assigned to route ${route.name}`,
+          });
+        }
+      }
+    }
 
     const savedRoute = await newRoute.save();
 
-    // for (let i = 0; i < customers.length; i++) {
-    //   await Customer.findByIdAndUpdate(customers[i], {
-    //     $set: { routeId: savedRoute._id },
-    //   });
-    // }
+    if (customers && customers.length) {
+      for (let i = 0; i < customers.length; i++) {
+        await Customer.findByIdAndUpdate(customers[i], {
+          $set: { routeId: savedRoute._id },
+        });
+      }
+    }
+
+    await Xero.synchContactGroupToXero(savedRoute._id);
+    await Xero.resynchContactGroupContactsToXero(savedRoute._id);
 
     res.status(200).json(savedRoute);
   } catch (err) {
     await log(`createRoute error : ${err}`);
     res.status(500).json(err);
+    console.log(err);
   }
 };
 exports.updateRoute = async (req, res) => {
@@ -88,8 +96,13 @@ exports.updateRoute = async (req, res) => {
           $set: { routeId: updatedRoute._id },
         });
       }
+      await Xero.synchContactGroupToXero(savedRoute._id);
+      await Xero.resynchContactGroupContactsToXero(savedRoute._id);
       return res.status(200).json(updatedRoute);
     }
+
+    await Xero.synchContactGroupToXero(savedRoute._id);
+    await Xero.resynchContactGroupContactsToXero(savedRoute._id);
     return res.status(200).json(updatedRoute);
   } catch (err) {
     await log(`updateRoute error : ${err}`);
