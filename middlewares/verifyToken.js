@@ -29,7 +29,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
 
 const verifyTokenAndAdmin = (req, res, next) => {
   let token = req.headers.token;
-  if (!token) return res.status(404).json("Only admins can do that !");
+  if (!token) return res.status(401).json("Only admins can do that !");
   verifyToken(req, res, () => {
     if (req.user.role && req.user.role == 1) {
       next();
