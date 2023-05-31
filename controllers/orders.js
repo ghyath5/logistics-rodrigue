@@ -355,29 +355,29 @@ exports.searchOrderByProductText = async (req, res) => {
     const isDate = moment(name, "", true).isValid();
     let findQuery = {};
     if (!isDate) {
-      const productsIDSQuery = await Products.find({
-        $or: [
-          { name: { $regex: name, $options: "i" } },
-          {
-            assignedCode: { $regex: name, $options: "i" },
-          },
-        ],
-      }).select("_id");
-      const customersIDSQuery = await Customer.find({
-        $or: [
-          { firstname: { $regex: name, $options: "i" } },
-          {
-            businessname: { $regex: name, $options: "i" },
-          },
-        ],
-      }).select("_id");
+      const productsPureIDS = (
+        await Products.find({
+          $or: [
+            { name: { $regex: name, $options: "i" } },
+            {
+              assignedCode: { $regex: name, $options: "i" },
+            },
+          ],
+        }).select("_id")
+      ).map(({ _id }) => _id.toString());
 
-      const [productsIDS, customersIDS] = await Promise.all([
-        productsIDSQuery,
-        customersIDSQuery,
-      ]);
-      const productsPureIDS = productsIDS.map(({ _id }) => _id.toString());
-      const customersPureIDS = customersIDS.map(({ _id }) => _id.toString());
+      const customersPureIDS = (
+        await Customer.find({
+          $or: [
+            { firstname: { $regex: name, $options: "i" } },
+            { lastname: { $regex: name, $options: "i" } },
+            {
+              businessname: { $regex: name, $options: "i" },
+            },
+          ],
+        }).select("_id")
+      ).map(({ _id }) => _id.toString());
+
       findQuery = {
         $or: [
           {

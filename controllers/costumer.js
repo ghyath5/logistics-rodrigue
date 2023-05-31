@@ -252,7 +252,8 @@ exports.findCustomerByTextSearch = async (req, res) => {
       $or: [
         { codeid: { $regex: find, $options: "i" } },
         { businessname: { $regex: find, $options: "i" } },
-        { customername: { $regex: find, $options: "i" } },
+        { firstname: { $regex: find, $options: "i" } },
+        { lastname: { $regex: find, $options: "i" } },
       ],
     })
       .sort("businessname")
