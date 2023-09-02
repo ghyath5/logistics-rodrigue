@@ -14,6 +14,27 @@ const RouteSchema = new mongoose.Schema(
         ref: "Customer",
       },
     ],
+    scheduledDays: [
+      // array of objects { day, customers }
+      {
+        // day should be a number raging 1 -> 14
+        day: {
+          type: Number,
+          validate: {
+            validator: function (v) {
+              return v > 0 && v < 15;
+            },
+          },
+        },
+        // array of called customers
+        calledCustomers: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Customer",
+          },
+        ],
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -136,6 +136,19 @@ exports.creatingRoute = [
     .isEmpty()
     .withMessage("From attribute is required"),
   check("to").trim().not().isEmpty().withMessage("To attribute is required"),
+  check("scheduledDays")
+    .optional()
+    .isArray()
+    .custom((value) => {
+      if (!value) return true;
+      for (let i = 0; i < value.length; i++) {
+        if (value[i].day < 1 || value[i].day > 14) {
+          return false;
+        }
+      }
+      return true;
+    })
+    .withMessage("Scheduled days must be an array of numbers ranging 1 -> 14"),
 ];
 // Creating RUNS
 exports.creatingRun = [
