@@ -96,13 +96,13 @@ exports.updateRoute = async (req, res) => {
           $set: { routeId: updatedRoute._id },
         });
       }
-      await Xero.synchContactGroupToXero(savedRoute._id);
-      await Xero.resynchContactGroupContactsToXero(savedRoute._id);
+      await Xero.synchContactGroupToXero(updatedRoute._id);
+      await Xero.resynchContactGroupContactsToXero(updatedRoute._id);
       return res.status(200).json(updatedRoute);
     }
 
-    await Xero.synchContactGroupToXero(savedRoute._id);
-    await Xero.resynchContactGroupContactsToXero(savedRoute._id);
+    await Xero.synchContactGroupToXero(updatedRoute._id);
+    await Xero.resynchContactGroupContactsToXero(updatedRoute._id);
     return res.status(200).json(updatedRoute);
   } catch (err) {
     await log(`updateRoute error : ${err}`);
