@@ -1,9 +1,14 @@
+const mongoose = require("mongoose");
 const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
 const Orders = require("../models/Orders");
 
 const Xero = require("../helpers/Xero");
 
+// Now you can access ObjectId through mongoose
+const ObjectId = mongoose.Types.ObjectId;
+
+// Example of using ObjectId
 exports.createRun = async (req, res) => {
   try {
     const newRun = new Run(req.body);
@@ -168,5 +173,36 @@ exports.getRunPdf = async (req, res) => {
   } catch (err) {
     await log(`getRunPdf error : ${err}`);
     res.status(500).json(err);
+  }
+};
+exports.findRunByDriverIdOrDate = async (req, res) => {
+  try {
+    const { find, page, limit } = req.query;
+
+    let query;
+    if (ObjectId.isValid(find)) {
+      query = { driver: new ObjectId(find) };
+    } else {
+      const parsedDate = new Date(find);
+      console.log("parsedDate", parsedDate);
+      if (!isNaN(parsedDate)) {
+        query = { date: parsedDate };
+      } else {
+        return res.status(400).json({ error: "Invalid query parameter" });
+      }
+    }
+    const found = await Run.find(query)
+      .populate("driver")
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+    if (!found)
+      return res
+        .status(404)
+        .json("no runs found for this driver or by this date");
+    return res.status(200).json(found);
+  } catch (err) {
+    console.log("findRunByDriverIdOrDate err", err);
+    await log(`findRunByDriverIdOrDate error : ${err}`);
+    return res.status(500).json(err);
   }
 };

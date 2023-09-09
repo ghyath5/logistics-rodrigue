@@ -105,6 +105,7 @@ exports.updateRoute = async (req, res) => {
     await Xero.resynchContactGroupContactsToXero(updatedRoute._id);
     return res.status(200).json(updatedRoute);
   } catch (err) {
+    console.log("err", err);
     await log(`updateRoute error : ${err}`);
     res.status(500).json(err);
   }

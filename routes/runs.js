@@ -6,6 +6,7 @@ const {
   getRun,
   getAllRuns,
   getRunPdf,
+  findRunByDriverIdOrDate,
 } = require("../controllers/runs");
 const { validateMongoId, validate } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
@@ -21,5 +22,7 @@ router
   .get(validateMongoId, getRun);
 
 router.route("/:id/pdf").get(validateMongoId, getRunPdf);
+
+router.route("/findrun").post(findRunByDriverIdOrDate);
 
 module.exports = router;
