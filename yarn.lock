@@ -2449,10 +2449,10 @@ wrappy@1:
   resolved "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
 
-xero-node@^4.33.0:
-  version "4.33.0"
-  resolved "https://registry.npmjs.org/xero-node/-/xero-node-4.33.0.tgz"
-  integrity sha512-cICj82xySeeOIs0hms6Df0xnSbOe59EOJCBxoTvATdPz3RBBiP+q0nY6iihVCspJiZ890a7SGLKRKMQL6SQrng==
+xero-node@4.36.0:
+  version "4.36.0"
+  resolved "https://registry.yarnpkg.com/xero-node/-/xero-node-4.36.0.tgz#4e0cb699c82f909858117b655c6e78925d5a1d0f"
+  integrity sha512-dqgcq/9IU+veqfb/SaojiVkQL5DxPNH8YMurHNQghRyluJUbg++4MKhDdjkDm9SPHgXZhPpjN5IEjVK7aVXBIg==
   dependencies:
     openid-client "^4.9.1"
     request "^2.88.0"

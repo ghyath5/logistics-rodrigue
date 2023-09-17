@@ -15,8 +15,6 @@ const xeroConfig = {
   grantType: "client_credentials",
 };
 
-const summarizeErrors = true;
-
 const xero = new XeroClient(xeroConfig);
 
 // STREET: Delivery address
@@ -88,13 +86,9 @@ const synchCustomerToXero = async (customer) => {
   }
 
   if (contacts.body.contacts.length === 0) {
-    const contacts = await xero.accountingApi.createContacts(
-      "",
-      {
-        contacts: [addUpdateFields],
-      },
-      summarizeErrors
-    );
+    const contacts = await xero.accountingApi.createContacts("", {
+      contacts: [addUpdateFields],
+    });
 
     await Customer.findByIdAndUpdate(customer._id, {
       xeroid: contacts.body.contacts[0].contactID,
@@ -251,13 +245,9 @@ const synchProductToXero = async (product) => {
 
   if (items.body.items.length === 0) {
     // create
-    const items = await xero.accountingApi.createItems(
-      "",
-      {
-        items: [addUpdateFields],
-      },
-      summarizeErrors
-    );
+    const items = await xero.accountingApi.createItems("", {
+      items: [addUpdateFields],
+    });
 
     // update product xeroid
     await Product.findByIdAndUpdate(product._id, {
@@ -267,14 +257,9 @@ const synchProductToXero = async (product) => {
     console.log("Xero Item created successfully");
   } else {
     // update
-    await xero.accountingApi.updateItem(
-      "",
-      items.body.items[0].itemID,
-      {
-        items: [addUpdateFields],
-      },
-      summarizeErrors
-    );
+    await xero.accountingApi.updateItem("", items.body.items[0].itemID, {
+      items: [addUpdateFields],
+    });
 
     console.log("Xero Item updated successfully");
   }
@@ -359,23 +344,26 @@ const synchContactGroupToXero = async (routeId) => {
   await xero.getClientCredentialsToken();
 
   const groups = xeroId
-    ? await xero.accountingApi.getContactGroups("", xeroId)
+    ? await xero.accountingApi.getContactGroups(
+        "",
+        `ContactGroupID==GUID("${xeroId}")`
+      )
     : { body: { contactGroups: [] } };
 
   const addUpdateFields = {
-    name: route.name,
     status: route.isarchived ? "ARCHIVED" : "ACTIVE",
   };
 
+  // if name has changed, update
+  if (route.name !== groups.body.contactGroups[0]?.name) {
+    addUpdateFields.name = route.name;
+  }
+
   if (groups.body.contactGroups.length === 0) {
     // create
-    const groups = await xero.accountingApi.createContactGroup(
-      "",
-      {
-        contactGroups: [addUpdateFields],
-      },
-      summarizeErrors
-    );
+    const groups = await xero.accountingApi.createContactGroup("", {
+      contactGroups: [addUpdateFields],
+    });
 
     // update route xeroid
     await Route.findByIdAndUpdate(route._id, {
@@ -390,8 +378,7 @@ const synchContactGroupToXero = async (routeId) => {
       groups.body.contactGroups[0].contactGroupID,
       {
         contactGroups: [addUpdateFields],
-      },
-      summarizeErrors
+      }
     );
     console.log("Xero Contact Group updated successfully");
   }
@@ -446,58 +433,39 @@ const synchAllContactGroupsFromXero = async () => {
 const removeContactFromGroupXero = async (contactId, groupId) => {
   await xero.getClientCredentialsToken();
 
-  await xero.accountingApi.deleteContactGroupContact(
-    "",
-    groupId,
-    contactId,
-    summarizeErrors
-  );
+  await xero.accountingApi.deleteContactGroupContact("", groupId, contactId);
 
   console.log("Contact removed from group successfully");
 };
 
 const removeAllContactsFromGroupXero = async (groupId) => {
   await xero.getClientCredentialsToken();
-  await xero.accountingApi.deleteContactGroupContacts(
-    "",
-    groupId,
-    summarizeErrors
-  );
+  await xero.accountingApi.deleteContactGroupContacts("", groupId);
   console.log("All Contacts removed from group successfully");
 };
 
 const addContactToGroupXero = async (contactId, groupId) => {
   await xero.getClientCredentialsToken();
 
-  await xero.accountingApi.createContactGroupContacts(
-    "",
-    groupId,
-    {
-      contacts: [
-        {
-          contactID: contactId,
-        },
-      ],
-    },
-    summarizeErrors
-  );
+  await xero.accountingApi.createContactGroupContacts("", groupId, {
+    contacts: [
+      {
+        contactID: contactId,
+      },
+    ],
+  });
 
   console.log("Contact added to group successfully");
 };
 
 const addContactsToGroupXero = async (xeroIds, groupId) => {
+  if (!xeroIds) return console.log("No Contacts to add to group");
   await xero.getClientCredentialsToken();
-
-  await xero.accountingApi.createContactGroupContacts(
-    "",
-    groupId,
-    {
-      contacts: xeroIds.map((xeroId) => ({
-        contactID: xeroId,
-      })),
-    },
-    summarizeErrors
-  );
+  await xero.accountingApi.createContactGroupContacts("", groupId, {
+    contacts: xeroIds.map((xeroId) => ({
+      contactID: xeroId,
+    })),
+  });
 
   console.log("Contacts added to group successfully");
 };
@@ -550,13 +518,9 @@ const createInvoice = async (orderId) => {
   };
 
   if (invoices.body.invoices.length === 0) {
-    const res = await xero.accountingApi.createInvoices(
-      "",
-      {
-        invoices: [addUpdateFields],
-      },
-      summarizeErrors
-    );
+    const res = await xero.accountingApi.createInvoices("", {
+      invoices: [addUpdateFields],
+    });
 
     await Order.findByIdAndUpdate(order._id, {
       invoiceid: res.body.invoices[0].invoiceID,
@@ -570,8 +534,7 @@ const createInvoice = async (orderId) => {
       invoices.body.invoices[0].invoiceID,
       {
         invoices: [addUpdateFields],
-      },
-      summarizeErrors
+      }
     );
     console.log("Xero Invoice updated successfully");
     return res.body.invoices[0].invoiceID;
@@ -659,7 +622,7 @@ const getInvoiceAsPdf = async (orderId) => {
 // });
 
 const resynchContactGroupContactsToXero = async (routeId) => {
-  const route = await Route.findById(routeId);
+  const route = await Route.findById(routeId).populate("customers");
   const contacts = route.customers.map((customer) => customer.xeroid);
 
   await removeAllContactsFromGroupXero(route.xeroid);
@@ -723,4 +686,5 @@ module.exports = {
   addContactToGroupXero,
   resynchContactGroupContactsToXero,
   resynchContactGroupContactsFromXero,
+  initialSync,
 };

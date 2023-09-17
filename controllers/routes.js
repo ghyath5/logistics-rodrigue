@@ -90,19 +90,35 @@ exports.updateRoute = async (req, res) => {
       { new: true }
     );
 
+    if (!updatedRoute) {
+      return res.status(404).json("No route was found with this id !");
+    }
+
     if (updatedRoute && customers && customers.length) {
       for (let i = 0; i < customers.length; i++) {
         await Customer.findByIdAndUpdate(customers[i], {
           $set: { routeId: updatedRoute._id },
         });
       }
-      await Xero.synchContactGroupToXero(updatedRoute._id);
-      await Xero.resynchContactGroupContactsToXero(updatedRoute._id);
-      return res.status(200).json(updatedRoute);
     }
 
-    await Xero.synchContactGroupToXero(updatedRoute._id);
-    await Xero.resynchContactGroupContactsToXero(updatedRoute._id);
+    try {
+      await Xero.synchContactGroupToXero(updatedRoute._id);
+      await Xero.resynchContactGroupContactsToXero(updatedRoute._id);
+    } catch (err) {
+      const error = err.response.body;
+      console.log(
+        `Status Code: ${err.response.statusCode} => ${JSON.stringify(
+          error,
+          null,
+          2
+        )}`
+      );
+      return res.status(500).json({
+        success: false,
+        message: `Xero error: ${error.Detail}`,
+      });
+    }
     return res.status(200).json(updatedRoute);
   } catch (err) {
     console.log("err", err);
