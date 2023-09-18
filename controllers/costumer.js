@@ -107,11 +107,6 @@ exports.updateCostumer = async (req, res) => {
       { new: true }
     );
     if (updatedCustomer) {
-      if (oldCustomer.preferredday !== updatedCustomer.preferredday) {
-        await Customer.findByIdAndUpdate(req.params.id, {
-          $unset: { "sheduledCall.date": 1 },
-        });
-      }
 
       const oldRoute = await Route.findOne({ customers: req.params.id });
       const newRoute = await Route.findById(updatedCustomer.routeId);
@@ -356,56 +351,6 @@ exports.getTopCustomers = async (req, res) => {
     });
   } catch (err) {
     await log(`getTopCustomers error : ${err}`);
-    res.status(500).json(err);
-  }
-};
-exports.getCustomersToCall = async (req, res) => {
-  try {
-    const { routeId } = req.query;
-    const filters = {};
-    if (routeId) filters.routeId = routeId;
-    const tomorrow = moment().add(1, "days").format("dddd").toLowerCase();
-    const customers = await Customer.find({
-      preferredday: tomorrow,
-      isarchived: false,
-      "deliveryoccur.number": { $ne: 0 },
-      ...filters,
-      $or: [
-        { "sheduledCall.date": { $exists: false } },
-        {
-          "sheduledCall.date": {
-            $lte: moment().endOf("day").toDate(),
-            $gte: moment().startOf("day").toDate(),
-          },
-        },
-        {
-          "sheduledCall.date": {
-            $lte: moment().subtract(1, "weeks").endOf("day").toDate(),
-            $gte: moment().subtract(1, "weeks").startOf("day").toDate(),
-          },
-          "deliveryoccur.number": 1,
-        },
-        {
-          "sheduledCall.date": {
-            $lte: moment().subtract(2, "weeks").endOf("day").toDate(),
-            $gte: moment().subtract(2, "weeks").startOf("day").toDate(),
-          },
-          "deliveryoccur.number": 2,
-        },
-      ],
-    });
-
-    for (let customer of customers) {
-      customer.sheduledCall = {
-        date: moment().toDate(),
-        isCalled: customer.sheduledCall?.isCalled || false,
-      };
-      await customer.save();
-    }
-
-    res.status(200).json(customers);
-  } catch (err) {
-    await log(`getCustomersToCall error : ${err}`);
     res.status(500).json(err);
   }
 };

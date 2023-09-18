@@ -28,7 +28,7 @@ exports.getSalesByDay = async (req, res) => {
 exports.getOrdersByUserId = async (req, res) => {
   let userId = req.params.id;
   try {
-    const orders = await Order.find({ status: 2, initiateduser: userId });
+    const orders = await Order.find({ status: 0, initiateduser: userId });
 
     let totalIncome = 0;
     for (let i = 0; i < orders.length; i++) {

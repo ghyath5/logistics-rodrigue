@@ -7,7 +7,6 @@ const {
   getCostumerPaginatedArchived,
   findCustomerByTextSearch,
   getTopCustomers,
-  getCustomersToCall,
   toggleCall,
   getAllNonOrganizationalCustomers,
 } = require("../controllers/costumer");
@@ -26,9 +25,6 @@ router
   .route("/")
   .post(verifyTokenAndAdmin, validateCreateCustomer, validate, createCostumer)
   .get(verifyTokenAndAdmin, getCostumerPaginatedArchived);
-
-router.route("/calls").get(verifyTokenAndAdmin, getCustomersToCall);
-router.route("/:id/calls").put(verifyTokenAndAdmin, toggleCall);
 
 router
   .route("/:id")
