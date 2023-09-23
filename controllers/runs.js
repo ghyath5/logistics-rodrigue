@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Run = require("../models/Run");
 const { log } = require("../helpers/Loger");
 const Orders = require("../models/Orders");
+const moment = require("moment");
 
 const Xero = require("../helpers/Xero");
 
@@ -186,7 +187,12 @@ exports.findRunByDriverIdOrDate = async (req, res) => {
       const parsedDate = new Date(find);
       console.log("parsedDate", parsedDate);
       if (!isNaN(parsedDate)) {
-        query = { date: parsedDate };
+        query = {
+          date: {
+            $gte: moment(parsedDate).startOf("day").toDate(),
+            $lte: moment(parsedDate).endOf("day").toDate(),
+          },
+        };
       } else {
         return res.status(400).json({ error: "Invalid query parameter" });
       }
