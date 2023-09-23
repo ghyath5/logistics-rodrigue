@@ -27,16 +27,15 @@ exports.createRoute = async (req, res) => {
           });
         }
 
-        const route = await Route.findOne({ customers: customers[i] });
-        if (route) {
-          return res.status(400).json({
-            success: false,
-            message: `${customer.businessname} is already assigned to route ${route.name}`,
-          });
-        }
+        // const route = await Route.findOne({ customers: customers[i] });
+        // if (route) {
+        //   return res.status(400).json({
+        //     success: false,
+        //     message: `${customer.businessname} is already assigned to route ${route.name}`,
+        //   });
+        // }
       }
     }
-
     const savedRoute = await newRoute.save();
 
     if (customers && customers.length) {
@@ -54,7 +53,6 @@ exports.createRoute = async (req, res) => {
   } catch (err) {
     await log(`createRoute error : ${err}`);
     res.status(500).json(err);
-    console.log(err);
   }
 };
 exports.updateRoute = async (req, res) => {

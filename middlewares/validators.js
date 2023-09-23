@@ -124,18 +124,7 @@ exports.validatePhone = [
 // Creating Routes
 exports.creatingRoute = [
   check("name").trim().not().isEmpty().withMessage("Route Name is missing"),
-  check("description")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Route description is missing"),
-  check("places").not().isEmpty().withMessage("Route places are missing"),
-  check("from")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("From attribute is required"),
-  check("to").trim().not().isEmpty().withMessage("To attribute is required"),
+
   check("scheduledDays")
     .optional()
     .isArray()

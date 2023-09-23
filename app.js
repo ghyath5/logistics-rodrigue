@@ -102,21 +102,3 @@ app.listen(process.env.PORT || 5002, () => {
 // USID = rodrick.abdallah@gmail.com
 // PASS = pa$$w0rd
 // ==========================
-
-// call customers on friday if their
-// preffered day is monday
-// search by run by date and driver name
-// cancel an invoice in xero from the ERP
-// delete an invoice in xero from the ERP
-// edit an order in xero from the ERP
-// grouping of the products by run depending on their weight
-
-// ===========================
-// check if the groupings in xero can be imported to the system
-// do fortnight option for the newly imported
-// customers from xero
-
-//==============================
-// TODO: MAURICE :
-// same convention in namings
-// handle getCategory controller

@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema(
-  // status 0: pending
-  // status 1: confimred
-  // status 2: done
-  // status 3: canceled
   {
     invoiceid: { type: String },
     customer: {
@@ -32,6 +28,9 @@ const OrderSchema = new mongoose.Schema(
     totalamount: { type: Number },
     date: { type: Date },
     notes: { type: String },
+    // status 0: done
+    // status 1: canceled
+    // status 2: deleted
     status: { type: Number, default: 0 },
     automaticallyGenerated: {
       type: Boolean,
