@@ -197,10 +197,12 @@ exports.findRunByDriverIdOrDate = async (req, res) => {
         return res.status(400).json({ error: "Invalid query parameter" });
       }
     }
+
     const found = await Run.find(query)
       .populate("driver")
       .limit(limit * 1)
       .skip((page - 1) * limit);
+    console.log("found", found);
     if (!found)
       return res
         .status(404)
