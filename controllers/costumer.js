@@ -25,8 +25,8 @@ exports.createCostumer = async (req, res) => {
     }
     newCustomer.codeid = codeid;
 
-    const businessnameUser = await Customer.findOne({ businessname });
-    if (businessnameUser) {
+    const businessNameUser = await Customer.findOne({ businessname });
+    if (businessNameUser) {
       return res.status(400).json({
         success: false,
         message:
@@ -98,7 +98,6 @@ exports.updateCostumer = async (req, res) => {
         });
       }
     }
-    const oldCustomer = await Customer.findById(req.params.id);
     const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       {
@@ -150,26 +149,26 @@ exports.deleteCostumer = async (req, res) => {
         message: "Cannot delete customer when associated to an order",
       });
 
-    const deleterCustomer = await Customer.findByIdAndDelete(req.params.id);
+    const deletedCustomer = await Customer.findByIdAndDelete(req.params.id);
 
-    if (!deleterCustomer) {
+    if (!deletedCustomer) {
       return res.status(404).json({
         success: false,
         message: "Customer not found",
       });
     }
 
-    if (deleterCustomer.organization) {
+    if (deletedCustomer.organization) {
       const organization = await Organization.findById(
-        deleterCustomer.organization
+        deletedCustomer.organization
       );
       if (organization) {
         const org = await Organization.findByIdAndUpdate(organization._id, {
-          $pull: { customers: deleterCustomer._id },
+          $pull: { customers: deletedCustomer._id },
         });
         if (!org.customers.length) {
           await Organization.findByIdAndDelete(organization._id);
-        } else if (org.head.toString === deleterCustomer._id.toString) {
+        } else if (org.head.toString === deletedCustomer._id.toString) {
           await Organization.findByIdAndUpdate(organization._id, {
             $set: { head: org.customers[0] },
           });

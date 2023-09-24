@@ -1,9 +1,7 @@
-const Route = require("../models/Route");
-const Customer = require("../models/Customer");
-const { log } = require("../helpers/Loger");
-const mongoose = require("mongoose");
-
 const Xero = require("../helpers/Xero");
+const Route = require("../models/Route");
+const { log } = require("../helpers/Loger");
+const Customer = require("../models/Customer");
 
 exports.createRoute = async (req, res) => {
   const { name } = req.body;
@@ -158,12 +156,12 @@ exports.getAllRoutes = async (_req, res) => {
   try {
     const routes = await Route.find().populate("customers").sort({ _id: -1 });
     const routeCount = await Route.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       routeCount,
       routes,
     };
     if (routes) {
-      res.status(200).json(objectTosend);
+      res.status(200).json(objectToSend);
     } else {
       return res.status(200).json("No routes found");
     }

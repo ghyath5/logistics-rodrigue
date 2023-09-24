@@ -1,8 +1,8 @@
-const Promotion = require("../models/Promotion");
-const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
+const Customer = require("../models/Customer");
 const Products = require("../models/Products");
 const Category = require("../models/Category");
+const Promotion = require("../models/Promotion");
 
 exports.createPromotion = async (req, res) => {
   const { productspromotion, categorypromotion, from, to } = req.body;
@@ -50,9 +50,9 @@ exports.createPromotion = async (req, res) => {
           });
         }
 
-        let originalproductprice = product.price;
+        let originalProductPrice = product.price;
 
-        if (originalproductprice <= productspromotion[i].newprice)
+        if (originalProductPrice <= productspromotion[i].newprice)
           return res.status(400).json({
             success: false,
             message:
@@ -125,7 +125,7 @@ exports.updatePromotion = async (req, res) => {
           return res.status(400).json({
             success: false,
             message:
-              "Please enter a lower price than the ususal one to create a promotion",
+              "Please enter a lower price than the usual one to create a promotion",
           });
       }
     } else {
@@ -226,13 +226,13 @@ exports.getAllPromotions = async (req, res) => {
       .exec();
     const promotionCount = await Promotion.countDocuments();
 
-    let objectTosend = {
+    let objectToSend = {
       promotionCount,
       promotions,
     };
 
     if (promotions) {
-      res.status(200).json(objectTosend);
+      res.status(200).json(objectToSend);
     } else {
       return res.status(200).json("No categories found");
     }

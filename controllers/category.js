@@ -1,5 +1,4 @@
 const Category = require("../models/Category");
-const Products = require("../models/Products");
 const { log } = require("../helpers/Loger");
 
 exports.createCategory = async (req, res) => {
@@ -13,7 +12,6 @@ exports.createCategory = async (req, res) => {
       res.status(200).json(savedCategory);
     }
   } catch (err) {
-    console.log("createCategory err", err);
     await log(`createCategory error : ${err}`);
     res.status(500).json(err);
   }
@@ -33,7 +31,6 @@ exports.updateCategory = async (req, res) => {
       res.status(404).json("There is no category with this id");
     }
   } catch (err) {
-    console.log("updateCategory err", err);
     await log(`updateCategory error : ${err}`);
     res.status(500).json(err);
   }
@@ -54,7 +51,6 @@ exports.deleteCategory = async (req, res) => {
       return res.status(200).json("Category deleted successfully...");
     }
   } catch (err) {
-    console.log("deleteCategory err", err);
     await log(`deleteCategory error : ${err}`);
     res.status(500).json(err);
   }
@@ -73,13 +69,13 @@ exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({ _id: -1 });
     const categoryCount = await Category.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       categoryCount,
       categories,
     };
 
     if (categories) {
-      return res.status(200).json(objectTosend);
+      return res.status(200).json(objectToSend);
     } else {
       return res.status(200).json("No categories found");
     }

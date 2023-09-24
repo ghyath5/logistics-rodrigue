@@ -1,20 +1,18 @@
-const Order = require("../models/Orders");
-const User = require("../models/User");
+const { get, isFunction } = require("lodash");
+const moment = require("moment");
+const xl = require("excel4node");
+
 const Run = require("../models/Run");
+const User = require("../models/User");
+const Xero = require("../helpers/Xero");
+const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
-const { getComingRuns, getAllComingRuns } = require("./runs");
-const { getCostumerInternally } = require("./costumer");
+const { getComingRuns } = require("./runs");
 const Customer = require("../models/Customer");
 const Products = require("../models/Products");
-const moment = require("moment");
-const { default: mongoose } = require("mongoose");
-const Orders = require("../models/Orders");
-const xl = require("excel4node");
-const { get, isFunction, stubTrue } = require("lodash");
+const { getCostumerInternally } = require("./costumer");
 
-const Xero = require("../helpers/Xero");
-
-exports.sendCustomeIdToCreateOrder = async (req, res) => {
+exports.sendCustomerIdToCreateOrder = async (req, res) => {
   try {
     const find = req.query?.find || "";
     const page = req.query?.page || 1;
@@ -101,7 +99,7 @@ exports.sendCustomeIdToCreateOrder = async (req, res) => {
       data: products,
     });
   } catch (err) {
-    await log(`sendCustomeIdToCreateOrder error : ${err}`);
+    await log(`sendCustomerIdToCreateOrder error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -316,12 +314,12 @@ exports.getAllOrders = async (req, res) => {
       .skip((page - 1) * limit);
 
     const orderCount = await Order.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       orderCount,
       orders,
     };
     if (orders) {
-      res.status(200).json(objectTosend);
+      res.status(200).json(objectToSend);
     } else {
       return res.status(200).json("No orders found");
     }

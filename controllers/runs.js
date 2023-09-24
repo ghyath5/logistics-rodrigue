@@ -126,12 +126,12 @@ exports.getAllRuns = async (req, res) => {
       .populate("driver", { name: 1 })
       .populate("vehicle");
     const runCount = await Run.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       runCount,
       runs,
     };
     if (runs) {
-      res.status(200).json(objectTosend);
+      res.status(200).json(objectToSend);
     } else {
       return res.status(200).json("No runs found");
     }
@@ -210,7 +210,6 @@ exports.findRunByDriverIdOrDate = async (req, res) => {
         .json("no runs found for this driver or by this date");
     return res.status(200).json(found);
   } catch (err) {
-    console.log("findRunByDriverIdOrDate err", err);
     await log(`findRunByDriverIdOrDate error : ${err}`);
     return res.status(500).json(err);
   }

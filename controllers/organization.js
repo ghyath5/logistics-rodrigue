@@ -1,6 +1,6 @@
-const Organization = require("../models/Organization");
-const Customer = require("../models/Customer");
 const { log } = require("../helpers/Loger");
+const Customer = require("../models/Customer");
+const Organization = require("../models/Organization");
 
 exports.createOrganization = async (req, res) => {
   try {
@@ -218,12 +218,12 @@ exports.getAllOrganizations = async (req, res) => {
       .sort({ _id: -1 })
       .populate("customers head");
     const organizationCount = await Organization.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       organizationCount,
       organizations,
     };
     if (organizations) {
-      res.status(200).json(objectTosend);
+      res.status(200).json(objectToSend);
     } else {
       return res.status(200).json("No organizations found");
     }

@@ -1,11 +1,8 @@
-const Products = require("../models/Products");
-const Order = require("../models/Orders");
 const { log } = require("../helpers/Loger");
-const Sharedrecords = require("../models/Sharedrecords");
-const Category = require("../models/Category");
-const { default: mongoose } = require("mongoose");
-
 const XeroHelper = require("../helpers/Xero");
+const Category = require("../models/Category");
+const Products = require("../models/Products");
+const Sharedrecords = require("../models/Sharedrecords");
 
 exports.createProduct = async (req, res) => {
   const { name, assignedCode } = req.body;

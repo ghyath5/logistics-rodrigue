@@ -91,12 +91,12 @@ exports.getAllDrivers = async (req, res) => {
   try {
     const drivers = await Driver.find().sort({ _id: -1 });
     const driversCount = await Driver.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       driversCount,
       drivers,
     };
     if (drivers) {
-      res.status(200).json(objectTosend);
+      res.status(200).json(objectToSend);
     } else {
       res.status(404).json("There are no drivers");
     }

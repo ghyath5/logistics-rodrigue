@@ -5,7 +5,7 @@ const {
   deleteOrder,
   getOrder,
   getAllOrders,
-  sendCustomeIdToCreateOrder,
+  sendCustomerIdToCreateOrder,
   searchOrderByProductText,
   exportOrdersAsExcelFile,
   getOrdersByDate,
@@ -19,7 +19,7 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 router
   .route("/sendcustomeridfororder/:id")
-  .post(verifyTokenAndAdmin, sendCustomeIdToCreateOrder);
+  .post(verifyTokenAndAdmin, sendCustomerIdToCreateOrder);
 
 router
   .route("/")

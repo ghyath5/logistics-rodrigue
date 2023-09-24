@@ -7,7 +7,6 @@ exports.signup = async (req, res) => {
   try {
     const { name, email, phonenumber, username, role } = req.body;
 
-    //check if email is duplicate
     const emailUser = await User.findOne({ email });
     if (emailUser) {
       return res.status(400).json({
@@ -17,7 +16,6 @@ exports.signup = async (req, res) => {
       });
     }
 
-    //check if name is duplicate
     const nameUser = await User.findOne({ name });
     if (nameUser) {
       return res.status(400).json({
@@ -27,7 +25,6 @@ exports.signup = async (req, res) => {
       });
     }
 
-    //check if phonenumber is duplicate
     const phonenumberUser = await User.findOne({ phonenumber });
     if (phonenumberUser) {
       return res

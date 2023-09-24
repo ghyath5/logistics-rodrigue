@@ -77,12 +77,12 @@ exports.getAllVehicles = async (req, res) => {
   try {
     const vehicles = await Vehicle.find().sort({ _id: -1 });
     const vehicleCount = await Vehicle.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       vehicleCount,
       vehicles,
     };
     if (vehicles) {
-      res.status(200).json(objectTosend);
+      res.status(200).json(objectToSend);
     } else {
       return res.status(200).json("No vehicles found");
     }

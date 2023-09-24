@@ -68,11 +68,11 @@ exports.getAllUsers = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
     const userCount = await User.countDocuments();
-    let objectTosend = {
+    let objectToSend = {
       userCount,
       users,
     };
-    res.status(200).json(objectTosend);
+    res.status(200).json(objectToSend);
   } catch (err) {
     await log(`getAllUsers error : ${err}`);
     res.status(500).json(err);
