@@ -3,7 +3,7 @@ const moment = require("moment");
 const Route = require("./models/Route");
 const CallLog = require("./models/callLog");
 
-console.log("initalized");
+console.log("initialized");
 
 // Route schedule cleanup task
 const runRouteCleanupTask = async () => {
