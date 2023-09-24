@@ -7,8 +7,6 @@ const {
 const { validate } = require("../middlewares/validators");
 const { verifyToken } = require("../middlewares/verifyToken");
 
-//=============================
-
 router
   .route("/")
   .put(verifyToken, validate, update)

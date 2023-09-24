@@ -24,7 +24,7 @@ exports.updateUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
-exports.deteleUser = async (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
     const ordersWithThisUser = await Order.find({
       initiateduser: req.params.id,
@@ -41,7 +41,7 @@ exports.deteleUser = async (req, res) => {
       message: "User has been successfully deleted...",
     });
   } catch (err) {
-    await log(`deteleUser error : ${err}`);
+    await log(`deleteUser error : ${err}`);
     res.status(500).json(err);
   }
 };

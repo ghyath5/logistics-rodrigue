@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json("You are not authenticated!");
   }
 };
-// so one can update himself for example
+
 const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.user.id === req.params.id || req.user.role == 1) {
@@ -25,6 +25,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
     }
   });
 };
+
 const verifyTokenAndAdmin = (req, res, next) => {
   let token = req.headers.token;
   if (!token) return res.status(401).json("Only admins can do that !");
@@ -36,6 +37,7 @@ const verifyTokenAndAdmin = (req, res, next) => {
     }
   });
 };
+
 const verifyUpperAdmin = (req, res, next) => {
   if (!req.user.isUpperAdmin) {
     return res.status(403).json("Only upper admin can do such operations!");

@@ -6,13 +6,11 @@ const {
   getVehicle,
   getAllVehicles,
 } = require("../controllers/vehicle");
-const { validateMongoId, validate } = require("../middlewares/validators");
 const {
   verifyTokenAndAdmin,
   verifyTokenAndAuthorization,
 } = require("../middlewares/verifyToken");
-
-//=============================
+const { validateMongoId, validate } = require("../middlewares/validators");
 
 router
   .route("/")

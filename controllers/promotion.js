@@ -4,7 +4,7 @@ const { log } = require("../helpers/Loger");
 const Products = require("../models/Products");
 const Category = require("../models/Category");
 
-exports.createpromotion = async (req, res) => {
+exports.createPromotion = async (req, res) => {
   const { productspromotion, categorypromotion, from, to } = req.body;
   try {
     let now = new Date();
@@ -72,7 +72,7 @@ exports.createpromotion = async (req, res) => {
     const savedPromotion = await newPromotion.save();
     return res.status(200).json({ success: true, data: savedPromotion });
   } catch (err) {
-    await log(`createpromotion error : ${err}`);
+    await log(`createPromotion error : ${err}`);
     res.status(500).json(err);
   }
 };

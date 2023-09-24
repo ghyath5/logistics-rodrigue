@@ -8,10 +8,8 @@ const {
   getRunPdf,
   findRunByDriverIdOrDate,
 } = require("../controllers/runs");
-const { validateMongoId, validate } = require("../middlewares/validators");
 const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
-
-//==============================
+const { validateMongoId, validate } = require("../middlewares/validators");
 
 router.route("/").post(verifyTokenAndAdmin, createRun).get(getAllRuns);
 

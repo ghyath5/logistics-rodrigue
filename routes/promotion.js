@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 const {
-  createpromotion,
+  createPromotion,
   updatePromotion,
   deletePromotion,
   getPromotion,
@@ -16,7 +16,7 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 router
   .route("/")
-  .post(verifyTokenAndAdmin, creatingPromotion, validate, createpromotion)
+  .post(verifyTokenAndAdmin, creatingPromotion, validate, createPromotion)
   .get(verifyTokenAndAdmin, getAllPromotions);
 
 router

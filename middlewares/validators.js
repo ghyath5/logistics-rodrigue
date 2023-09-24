@@ -1,5 +1,5 @@
-const { check, validationResult } = require("express-validator");
 const mongoose = require("mongoose");
+const { check, validationResult } = require("express-validator");
 
 // AUTH
 exports.validateSignup = [
@@ -31,6 +31,7 @@ exports.validateSignup = [
     .isEmpty()
     .withMessage("Phone Number is missing"),
 ];
+
 exports.validateLogin = [
   check("username").trim().not().isEmpty().withMessage("Username is missing"),
   check("password")
@@ -39,6 +40,7 @@ exports.validateLogin = [
     .isEmpty()
     .withMessage("Password cannot be empty"),
 ];
+
 // Creating Customer
 exports.validateCreateCustomer = [
   check("abn").trim().not().isEmpty().withMessage("Abn field is missing"),
@@ -81,6 +83,7 @@ exports.validateCreateCustomer = [
   check("city").trim().not().isEmpty().withMessage("City is required"),
   check("address").trim().not().isEmpty().withMessage("Address is required"),
 ];
+
 // Creating Promotion
 exports.creatingPromotion = [
   check("name").trim().not().isEmpty().withMessage("Promotion Name is missing"),
@@ -95,6 +98,7 @@ exports.creatingPromotion = [
     .isEmpty()
     .withMessage("Promotion ending date is missing"),
 ];
+
 // Creating Order
 exports.creatingOrder = [
   check("customer")
@@ -115,16 +119,18 @@ exports.creatingOrder = [
     .isEmpty()
     .withMessage("Please insert at least one product"),
 ];
+
 exports.validateName = [
   check("name").trim().not().isEmpty().withMessage("Name is missing"),
 ];
+
 exports.validatePhone = [
   check("phone").trim().not().isEmpty().withMessage("Phone number is missing"),
 ];
+
 // Creating Routes
 exports.creatingRoute = [
   check("name").trim().not().isEmpty().withMessage("Route Name is missing"),
-
   check("scheduledDays")
     .optional()
     .isArray()
@@ -139,6 +145,7 @@ exports.creatingRoute = [
     })
     .withMessage("Scheduled days must be an array of numbers ranging 1 -> 14"),
 ];
+
 // Creating RUNS
 exports.creatingRun = [
   check("route").trim().not().isEmpty().withMessage("Route Id is missing"),
@@ -148,6 +155,7 @@ exports.creatingRun = [
     .isEmpty()
     .withMessage("Route places are missing"),
 ];
+
 // IDS
 exports.validateMongoId = (req, res, next) => {
   const isValid = mongoose.Types.ObjectId.isValid(req.params.id);
@@ -157,6 +165,7 @@ exports.validateMongoId = (req, res, next) => {
     next();
   }
 };
+
 exports.validateCategoryId = (req, res, next) => {
   const isValid = mongoose.Types.ObjectId.isValid(req.body.categoryId);
   if (!isValid) {
@@ -165,10 +174,10 @@ exports.validateCategoryId = (req, res, next) => {
     next();
   }
 };
+
 // MAIN
 exports.validate = (req, res, next) => {
   const error = validationResult(req).array();
   if (!error.length) return next();
-
   res.status(400).json({ success: false, error: error[0].msg });
 };

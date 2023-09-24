@@ -153,7 +153,7 @@ exports.getProduct = async (req, res) => {
     res.status(500).json(err);
   }
 };
-exports.getproductsPaginated = async (req, res) => {
+exports.getProductsPaginated = async (req, res) => {
   try {
     const { page = 1, limit = 5, isArchived } = req.query;
     const products = await Products.find(
@@ -178,7 +178,7 @@ exports.getproductsPaginated = async (req, res) => {
       .status(200)
       .json({ productsCount, hiddenProducts, visibleProducts, products });
   } catch (err) {
-    await log(`getproductsPaginated error : ${err}`);
+    await log(`getProductsPaginated error : ${err}`);
     res.status(500).json(err);
   }
 };

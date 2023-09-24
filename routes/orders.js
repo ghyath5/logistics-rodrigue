@@ -7,7 +7,7 @@ const {
   getAllOrders,
   sendCustomeIdToCreateOrder,
   searchOrderByProductText,
-  executeDeliveryOccur,
+  //  executeDeliveryOccur,
   exportOrdersAsExcelFile,
   getOrdersByDate,
 } = require("../controllers/orders");

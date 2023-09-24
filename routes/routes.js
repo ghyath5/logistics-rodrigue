@@ -26,4 +26,3 @@ router
   .get(verifyTokenAndAdmin, validateMongoId, getRouteRoute);
 
 module.exports = router;
-//=====================================

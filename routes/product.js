@@ -4,7 +4,7 @@ const {
   createProduct,
   updateProduct,
   getProduct,
-  getproductsPaginated,
+  getProductsPaginated,
   findProductsByTextSearch,
   getTopOrderedProducts,
   getTopProductsByCategory,
@@ -25,7 +25,7 @@ router
 router
   .route("/")
   .post(verifyTokenAndAdmin, validateCategoryId, validate, createProduct)
-  .get(getproductsPaginated);
+  .get(getProductsPaginated);
 
 router
   .route("/:id")
