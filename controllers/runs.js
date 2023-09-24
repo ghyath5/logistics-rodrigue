@@ -202,8 +202,7 @@ exports.findRunByDriverIdOrDate = async (req, res) => {
       .populate("driver")
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    console.log("found", found);
-    if (!found)
+     if (!found)
       return res
         .status(404)
         .json("no runs found for this driver or by this date");
