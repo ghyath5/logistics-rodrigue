@@ -144,11 +144,6 @@ exports.creatingRoute = [
 // Creating RUNS
 exports.creatingRun = [
   check("route").trim().not().isEmpty().withMessage("Route Id is missing"),
-  check("places")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Route places are missing"),
 ];
 
 // IDS
