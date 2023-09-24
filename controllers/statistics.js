@@ -1,8 +1,9 @@
-const Order = require("../models/Orders");
-const User = require("../models/User");
-const { log } = require("../helpers/Loger");
 const dayjs = require("dayjs");
 const moment = require("moment");
+
+const User = require("../models/User");
+const Order = require("../models/Orders");
+const { log } = require("../helpers/Loger");
 
 exports.getSalesByDay = async (req, res) => {
   const { date } = req.query;

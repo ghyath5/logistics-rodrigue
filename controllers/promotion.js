@@ -203,7 +203,7 @@ exports.getPromotion = async (req, res) => {
       res.status(404).json("No promotion was found with this id !");
     }
   } catch (err) {
-    await log(`deletePromotion error : ${err}`);
+    await log(`getPromotion error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -234,7 +234,7 @@ exports.getAllPromotions = async (req, res) => {
     if (promotions) {
       res.status(200).json(objectToSend);
     } else {
-      return res.status(200).json("No categories found");
+      return res.status(200).json("No promotions found");
     }
   } catch (err) {
     await log(`getAllPromotions error : ${err}`);

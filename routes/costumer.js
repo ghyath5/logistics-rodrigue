@@ -1,4 +1,5 @@
 const router = require("express").Router();
+
 const {
   createCostumer,
   updateCostumer,
@@ -7,7 +8,6 @@ const {
   getCostumerPaginatedArchived,
   findCustomerByTextSearch,
   getTopCustomers,
-  toggleCall,
   getAllNonOrganizationalCustomers,
 } = require("../controllers/costumer");
 const {

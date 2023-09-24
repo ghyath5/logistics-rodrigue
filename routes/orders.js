@@ -1,4 +1,5 @@
 const router = require("express").Router();
+
 const {
   createOrder,
   updateOrder,
@@ -30,7 +31,7 @@ router.route("/getordersbydate").get(verifyTokenAndAdmin, getOrdersByDate);
 
 router.route("/findbytext").post(verifyTokenAndAdmin, searchOrderByProductText);
 
-router.route("/export").get(exportOrdersAsExcelFile);
+// router.route("/export").get(exportOrdersAsExcelFile);
 
 router
   .route("/:id")

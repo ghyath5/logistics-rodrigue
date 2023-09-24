@@ -29,12 +29,12 @@ exports.createProduct = async (req, res) => {
         const codeSequence = await Sharedrecords.findById(
           process.env.SHARED_RECORDS_ID
         );
-        let codeid = codeSequence.productcodeid;
-        codeid = codeid.toString();
-        while (codeid.length < 4) {
-          codeid = "0" + codeid;
+        let codeId = codeSequence.productcodeid;
+        codeId = codeId.toString();
+        while (codeId.length < 4) {
+          codeId = "0" + codeId;
         }
-        newProduct.generatedCode = codeid;
+        newProduct.generatedCode = codeId;
         let savedProduct = await newProduct.save();
         await XeroHelper.synchProductToXero(savedProduct);
         if (newProduct.categoryId) {

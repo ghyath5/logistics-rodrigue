@@ -1,7 +1,7 @@
-const Paymentmethod = require("../models/Paymentmethod");
+const { log } = require("../helpers/Loger");
 const Customer = require("../models/Customer");
 const Sharedrecords = require("../models/Sharedrecords");
-const { log } = require("../helpers/Loger");
+const Paymentmethod = require("../models/Paymentmethod");
 
 exports.createPaymentMethod = async (req, res) => {
   try {
