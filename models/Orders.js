@@ -32,14 +32,14 @@ const OrderSchema = new mongoose.Schema(
     // status 1: canceled
     // status 2: deleted
     status: { type: Number, default: 0 },
-    automaticallyGenerated: {
-      type: Boolean,
-      default: false,
-    },
-    deliveryOccured: {
-      type: Boolean,
-      default: false,
-    },
+    // automaticallyGenerated: {
+    //   type: Boolean,
+    //   default: false,
+    // },
+    // deliveryOccured: {
+    //   type: Boolean,
+    //   default: false,
+    // },
     isBackOrder: {
       type: Boolean,
       default: false,

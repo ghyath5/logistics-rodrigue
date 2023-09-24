@@ -401,145 +401,145 @@ exports.searchOrderByProductText = async (req, res) => {
     res.status(500).json(err);
   }
 };
-exports.executeDeliveryOccur = async (req, res) => {
-  try {
-    const today = new Date();
-    const myToday = new Date(today);
-    const oneWeekAgo = moment(myToday).subtract(7, "days").toDate();
-    const twoWeeksAgo = moment(myToday).subtract(14, "days").toDate();
+// exports.executeDeliveryOccur = async (req, res) => {
+//   try {
+//     const today = new Date();
+//     const myToday = new Date(today);
+//     const oneWeekAgo = moment(myToday).subtract(7, "days").toDate();
+//     const twoWeeksAgo = moment(myToday).subtract(14, "days").toDate();
 
-    const orders = await Order.aggregate([
-      {
-        $lookup: {
-          from: "customers",
-          localField: "customer",
-          foreignField: "_id",
-          as: "customerObject",
-        },
-      },
-      {
-        $unwind: {
-          path: "$customerObject",
-        },
-      },
-      {
-        $lookup: {
-          from: "deliveriesoccurs",
-          localField: "customerObject.deliveryoccur",
-          foreignField: "_id",
-          as: "customerObject.deliveryoccur",
-        },
-      },
-      {
-        $unwind: {
-          path: "$customerObject.deliveryoccur",
-        },
-      },
-      {
-        $match: {
-          $or: [
-            {
-              date: { $gte: twoWeeksAgo, $lte: new Date() },
-              "customerObject.deliveryoccur.number": 2,
-            },
-            {
-              date: { $gte: oneWeekAgo, $lte: new Date() },
-              "customerObject.deliveryoccur.number": 1,
-            },
-          ],
-          status: 2, // only done orders
-          deliveryOccured: false, ///
-        },
-      },
-    ]);
+//     const orders = await Order.aggregate([
+//       {
+//         $lookup: {
+//           from: "customers",
+//           localField: "customer",
+//           foreignField: "_id",
+//           as: "customerObject",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$customerObject",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "deliveriesoccurs",
+//           localField: "customerObject.deliveryoccur",
+//           foreignField: "_id",
+//           as: "customerObject.deliveryoccur",
+//         },
+//       },
+//       {
+//         $unwind: {
+//           path: "$customerObject.deliveryoccur",
+//         },
+//       },
+//       {
+//         $match: {
+//           $or: [
+//             {
+//               date: { $gte: twoWeeksAgo, $lte: new Date() },
+//               "customerObject.deliveryoccur.number": 2,
+//             },
+//             {
+//               date: { $gte: oneWeekAgo, $lte: new Date() },
+//               "customerObject.deliveryoccur.number": 1,
+//             },
+//           ],
+//           status: 2, // only done orders
+//           deliveryOccured: false, ///
+//         },
+//       },
+//     ]);
 
-    const ordersIDS = orders.map((order) => order._id.toString()); // get pure orders ids
-    const updateOrdersDeliveryQuery = Order.updateMany(
-      // update orders deliveryOccured to avoid duplication same order multiple times
-      {
-        _id: { $in: ordersIDS },
-      },
-      {
-        $set: {
-          deliveryOccured: true,
-        },
-      }
-    );
+//     const ordersIDS = orders.map((order) => order._id.toString()); // get pure orders ids
+//     const updateOrdersDeliveryQuery = Order.updateMany(
+//       // update orders deliveryOccured to avoid duplication same order multiple times
+//       {
+//         _id: { $in: ordersIDS },
+//       },
+//       {
+//         $set: {
+//           deliveryOccured: true,
+//         },
+//       }
+//     );
 
-    const [allRuns] = await Promise.all([
-      getAllComingRuns(), //get all Runs to check
-      updateOrdersDeliveryQuery,
-    ]);
+//     const [allRuns] = await Promise.all([
+//       getAllComingRuns(), //get all Runs to check
+//       updateOrdersDeliveryQuery,
+//     ]);
 
-    const bulkUpsertOps = [];
-    const inserts = [];
+//     const bulkUpsertOps = [];
+//     const inserts = [];
 
-    const ordersToCreate = [...orders].map((current) => {
-      let order = { ...current }; //clone current order
-      order._id = new mongoose.Types.ObjectId(); //generate new Order Object Id
+//     const ordersToCreate = [...orders].map((current) => {
+//       let order = { ...current }; //clone current order
+//       order._id = new mongoose.Types.ObjectId(); //generate new Order Object Id
 
-      if (!order?.customerObject) return order;
-      if (order.customerObject?.deliveryoccur?.number == 2) {
-        order.date = moment(order.date).add(14, "days").toDate(); // add 14 days to date if number is 2
-      } else {
-        order.date = moment(order.date).add(7, "days").toDate(); // add 7 days to date if number is 1
-      }
-      const formatedOrderDate = moment(order.date).format("L");
-      const customerRouteId = order.customerObject?.routeId?.toString(); // customer route id from order customer object
-      const existComingRun = allRuns.find((oneComingRun) => {
-        // check existing coming run based on date and route id then return it
-        if (!oneComingRun?.route || !oneComingRun?.date) return false;
-        let formattedRunDate = moment(oneComingRun.date).format("L");
-        let runRouteId = oneComingRun.route.toString();
-        return (
-          formattedRunDate == formatedOrderDate && runRouteId == customerRouteId
-        );
-      });
-      if (existComingRun) {
-        // if coming Run, update and push the new order id
-        let runId = existComingRun._id.toString();
-        bulkUpsertOps.push({
-          updateOne: {
-            filter: { _id: runId },
-            update: { $push: { orders: order._id } },
-            upsert: true,
-          },
-        });
-      } else {
-        // if not comin run, create new one with the new order id
-        inserts.push({
-          date: formatedOrderDate,
-          orders: [order._id],
-          route: customerRouteId,
-        });
-        // bulkUpsertOps.push({
-        //   insertOne: {
-        //     document: {
-        //       date: formatedOrderDate,
-        //       orders: [order._id],
-        //       route: customerRouteId,
-        //     },
-        //   },
-        // });
-      }
-      delete order.customerObject;
-      order.status = 0;
-      order.automaticallyGenerated = true;
-      order.deliveryOccured = false;
-      order.products = order.products.map((product) => {
-        delete product._id;
-        return product;
-      });
-      return order;
-    });
-    let createdOrders = await Order.insertMany(ordersToCreate);
-    res.status(200).json({ orders: createdOrders }); //send created order to the client
-    await Promise.all([Run.bulkWrite(bulkUpsertOps), Run.insertMany(inserts)]); // create or update Runs
-  } catch (err) {
-    await log(`executeDeliveryOccur error : ${err}`);
-    res.status(500).json(err);
-  }
-};
+//       if (!order?.customerObject) return order;
+//       if (order.customerObject?.deliveryoccur?.number == 2) {
+//         order.date = moment(order.date).add(14, "days").toDate(); // add 14 days to date if number is 2
+//       } else {
+//         order.date = moment(order.date).add(7, "days").toDate(); // add 7 days to date if number is 1
+//       }
+//       const formatedOrderDate = moment(order.date).format("L");
+//       const customerRouteId = order.customerObject?.routeId?.toString(); // customer route id from order customer object
+//       const existComingRun = allRuns.find((oneComingRun) => {
+//         // check existing coming run based on date and route id then return it
+//         if (!oneComingRun?.route || !oneComingRun?.date) return false;
+//         let formattedRunDate = moment(oneComingRun.date).format("L");
+//         let runRouteId = oneComingRun.route.toString();
+//         return (
+//           formattedRunDate == formatedOrderDate && runRouteId == customerRouteId
+//         );
+//       });
+//       if (existComingRun) {
+//         // if coming Run, update and push the new order id
+//         let runId = existComingRun._id.toString();
+//         bulkUpsertOps.push({
+//           updateOne: {
+//             filter: { _id: runId },
+//             update: { $push: { orders: order._id } },
+//             upsert: true,
+//           },
+//         });
+//       } else {
+//         // if not comin run, create new one with the new order id
+//         inserts.push({
+//           date: formatedOrderDate,
+//           orders: [order._id],
+//           route: customerRouteId,
+//         });
+//         // bulkUpsertOps.push({
+//         //   insertOne: {
+//         //     document: {
+//         //       date: formatedOrderDate,
+//         //       orders: [order._id],
+//         //       route: customerRouteId,
+//         //     },
+//         //   },
+//         // });
+//       }
+//       delete order.customerObject;
+//       order.status = 0;
+//       order.automaticallyGenerated = true;
+
+//       order.products = order.products.map((product) => {
+//         delete product._id;
+//         return product;
+//       });
+//       return order;
+//     });
+//     let createdOrders = await Order.insertMany(ordersToCreate);
+//     res.status(200).json({ orders: createdOrders }); //send created order to the client
+//     await Promise.all([Run.bulkWrite(bulkUpsertOps), Run.insertMany(inserts)]); // create or update Runs
+//   } catch (err) {
+//     await log(`executeDeliveryOccur error : ${err}`);
+//     res.status(500).json(err);
+//   }
+// };
 exports.exportOrdersAsExcelFile = async (req, res) => {
   try {
     const from = moment(

@@ -107,7 +107,6 @@ exports.updateCostumer = async (req, res) => {
       { new: true }
     );
     if (updatedCustomer) {
-
       const oldRoute = await Route.findOne({ customers: req.params.id });
       const newRoute = await Route.findById(updatedCustomer.routeId);
       if (updatedCustomer.routeId) {

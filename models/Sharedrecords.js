@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const SharedRecordsSchema = new mongoose.Schema(
+const SharedrecordsSchema = new mongoose.Schema(
   {
     customercodeid: { type: Number },
     productcodeid: { type: Number },
@@ -12,4 +12,4 @@ const SharedRecordsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Sharedrecords", SharedRecordsSchema);
+module.exports = mongoose.model("Sharedrecords", SharedrecordsSchema);

@@ -13,11 +13,9 @@ require("./helpers/Xero");
 const {
   authRoute,
   runsRoute,
-  billersRoute,
   usersRoute,
   routeRoute,
   ordersRoute,
-  deliveryOccurRoute,
   promotionRoute,
   paymentMethodRoute,
   productRoute,
@@ -65,7 +63,6 @@ app.use("/api/customers", costumerRoute);
 app.use("/api/promotion", promotionRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/paymentmethod", paymentMethodRoute);
-app.use("/api/deliveryoccur", deliveryOccurRoute);
 app.use("/api/vehicles", vehiclesRoute);
 app.use("/api/people", peopleRoute);
 app.use("/api/organization", organizationRoute);

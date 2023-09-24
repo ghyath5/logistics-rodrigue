@@ -1,9 +1,8 @@
 const router = require("express").Router();
 
 const {
-  createproduct,
+  createProduct,
   updateProduct,
-  // deleteProduct,
   getProduct,
   getproductsPaginated,
   findProductsByTextSearch,
@@ -25,7 +24,7 @@ router
 
 router
   .route("/")
-  .post(verifyTokenAndAdmin, validateCategoryId, validate, createproduct)
+  .post(verifyTokenAndAdmin, validateCategoryId, validate, createProduct)
   .get(getproductsPaginated);
 
 router

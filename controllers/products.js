@@ -7,7 +7,7 @@ const { default: mongoose } = require("mongoose");
 
 const XeroHelper = require("../helpers/Xero");
 
-exports.createproduct = async (req, res) => {
+exports.createProduct = async (req, res) => {
   const { name, assignedCode } = req.body;
 
   try {
@@ -52,7 +52,7 @@ exports.createproduct = async (req, res) => {
       }
     }
   } catch (err) {
-    await log(`createproduct error : ${err}`);
+    await log(`createProduct error : ${err}`);
     res.status(500).json(err);
   }
 };
@@ -97,47 +97,47 @@ exports.updateProduct = async (req, res) => {
     res.status(500).json(err);
   }
 };
-exports.deleteProduct = async (req, res) => {
-  try {
-    const productsFromOrder = await Order.aggregate([
-      {
-        $lookup: {
-          from: "products",
-          foreignField: "_id",
-          localField: "products.product",
-          as: "products",
-        },
-      },
-      { $unwind: "$products" },
-      {
-        $match: {
-          "products._id": { $eq: new mongoose.Types.ObjectId(req.params.id) },
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-        },
-      },
-    ]);
+// exports.deleteProduct = async (req, res) => {
+//   try {
+//     const productsFromOrder = await Order.aggregate([
+//       {
+//         $lookup: {
+//           from: "products",
+//           foreignField: "_id",
+//           localField: "products.product",
+//           as: "products",
+//         },
+//       },
+//       { $unwind: "$products" },
+//       {
+//         $match: {
+//           "products._id": { $eq: new mongoose.Types.ObjectId(req.params.id) },
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 1,
+//         },
+//       },
+//     ]);
 
-    if (productsFromOrder.length)
-      return res.status(403).json({
-        success: false,
-        message:
-          "This Product cannot be deleted since it is associated with one or more orders",
-      });
+//     if (productsFromOrder.length)
+//       return res.status(403).json({
+//         success: false,
+//         message:
+//           "This Product cannot be deleted since it is associated with one or more orders",
+//       });
 
-    await Products.findByIdAndDelete(req.params.id);
-    return res.status(200).json({
-      success: true,
-      message: "This Product is successfully deleted",
-    });
-  } catch (err) {
-    await log(`deleteProduct error : ${err}`);
-    res.status(500).json(err);
-  }
-};
+//     await Products.findByIdAndDelete(req.params.id);
+//     return res.status(200).json({
+//       success: true,
+//       message: "This Product is successfully deleted",
+//     });
+//   } catch (err) {
+//     await log(`deleteProduct error : ${err}`);
+//     res.status(500).json(err);
+//   }
+// };
 exports.getProduct = async (req, res) => {
   try {
     const product = await Products.findById(req.params.id).populate(
