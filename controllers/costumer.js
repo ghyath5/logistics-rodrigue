@@ -283,7 +283,7 @@ exports.getTopCustomers = async (req, res) => {
       },
       {
         $match: {
-          "orders.status": 2,
+          "orders.status": 0,
         },
       },
       {
@@ -313,7 +313,7 @@ exports.getTopCustomers = async (req, res) => {
     const todayOrdersArray = await Order.find({ date: formattedDate });
     const todayDeliveredOrdersArray = await Order.find({
       date: formattedDate,
-      status: 2,
+      status: 0,
     });
     let todayDeliveredOrders = todayDeliveredOrdersArray.length || 0;
     let todayOrders = todayOrdersArray.length || 0;

@@ -32,14 +32,14 @@ exports.updateRun = async (req, res) => {
 
     const ordersIds = updatedRun.orders.map((order) => order._id?.toString());
 
-    if (updatedRun.status >= 2) {
-      await Orders.updateMany(
-        {
-          _id: { $in: ordersIds },
-        },
-        { $set: { status: updatedRun.status } }
-      );
-    }
+    // if (updatedRun.status >= 2) {
+    //   await Orders.updateMany(
+    //     {
+    //       _id: { $in: ordersIds },
+    //     },
+    //     { $set: { status: updatedRun.status } }
+    //   );
+    // }
 
     // update all orders date in that run
     if (updatedRun.date) {
@@ -92,8 +92,9 @@ exports.getRun = async (req, res) => {
 };
 exports.getComingRuns = async (routeId) => {
   try {
+    let now = new Date();
     const run = await Run.find({
-      $and: [{ $or: [{ status: 0 }, { status: 1 }] }, { route: routeId }],
+      $and: [{ date: { $lte: now } }, { route: routeId }],
     });
 
     if (run) {
@@ -108,7 +109,8 @@ exports.getComingRuns = async (routeId) => {
 };
 exports.getAllComingRuns = async () => {
   try {
-    const runs = await Run.find({ $or: [{ status: 0 }, { status: 1 }] });
+    let now = new Date();
+    const runs = await Run.find({ date: { $lte: now } });
     return runs || [];
   } catch (err) {
     await log(`getAllComingRuns error : ${err}`);

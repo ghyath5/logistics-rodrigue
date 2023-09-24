@@ -11,8 +11,8 @@ const { verifyUpperAdmin, verifyToken } = require("../middlewares/verifyToken");
 router
   .route("/:id")
   .get(verifyToken, verifyUpperAdmin, getUser)
-  .put(verifyToken, verifyUpperAdmin, validateMongoId, validate, updateUser)
-  .delete(verifyToken, verifyUpperAdmin, validateMongoId, validate, deleteUser);
+  .put(verifyToken, verifyUpperAdmin, validateMongoId, validate, updateUser);
+// .delete(verifyToken, verifyUpperAdmin, validateMongoId, validate, deleteUser);
 
 router.route("/find").post(verifyUpperAdmin, findUsersByTextSearch);
 

@@ -302,24 +302,6 @@ exports.getAllOrders = async (req, res) => {
   const { limit, page, done, backOrder } = req.query;
 
   try {
-    // const statusFilters =
-    //   done === "all"
-    //     ? {}
-    //     : done === "false"
-    //     ? { $or: [{ status: 0 }, { status: 1 }, { status: 3 }] }
-    //     : { status: 2 };
-
-    // const backOrderFilters =
-    //   backOrder === "true"
-    //     ? { isBackOrder: true }
-    //     : backOrder === "false"
-    //     ? { isBackOrder: false }
-    //     : {};
-
-    // const orders = await Order.find({
-    //   ...statusFilters,
-    //   ...backOrderFilters,
-    // })
     const orders = await Order.find()
       .populate("customer")
       .populate({
@@ -548,7 +530,7 @@ exports.exportOrdersAsExcelFile = async (req, res) => {
       .add(1, "days")
       .toDate();
     const orders = await Orders.find({
-      status: 2,
+      status: 0,
       date: {
         $gte: from,
         $lte: to,

@@ -24,27 +24,27 @@ exports.updateUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
-exports.deleteUser = async (req, res) => {
-  try {
-    const ordersWithThisUser = await Order.find({
-      initiateduser: req.params.id,
-    });
-    if (ordersWithThisUser?.length)
-      return res.status(people / staffmembers).json({
-        success: false,
-        message: "Cannot delete user when associated to an order",
-      });
+// exports.deleteUser = async (req, res) => {
+//   try {
+//     const ordersWithThisUser = await Order.find({
+//       initiateduser: req.params.id,
+//     });
+//     if (ordersWithThisUser?.length)
+//       return res.status(people / staffmembers).json({
+//         success: false,
+//         message: "Cannot delete user when associated to an order",
+//       });
 
-    await User.findByIdAndDelete(req.params.id);
-    return res.status(200).json({
-      success: false,
-      message: "User has been successfully deleted...",
-    });
-  } catch (err) {
-    await log(`deleteUser error : ${err}`);
-    res.status(500).json(err);
-  }
-};
+//     await User.findByIdAndDelete(req.params.id);
+//     return res.status(200).json({
+//       success: false,
+//       message: "User has been successfully deleted...",
+//     });
+//   } catch (err) {
+//     await log(`deleteUser error : ${err}`);
+//     res.status(500).json(err);
+//   }
+// };
 exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

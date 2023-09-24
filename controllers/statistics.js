@@ -16,7 +16,7 @@ exports.getSalesByDay = async (req, res) => {
     ]);
     let totalIncome = 0;
     for (let i = 0; i < orders.length; i++) {
-      if (orders[i].status == 2)
+      if (orders[i].status == 0)
         totalIncome = totalIncome + orders[i].totalamount;
     }
     res.status(200).json({ success: true, totalIncome });
@@ -28,7 +28,7 @@ exports.getSalesByDay = async (req, res) => {
 exports.getOrdersByUserId = async (req, res) => {
   let userId = req.params.id;
   try {
-    const orders = await Order.find({ status: 0, initiateduser: userId });
+    const orders = await Order.find({ initiateduser: userId });
 
     let totalIncome = 0;
     for (let i = 0; i < orders.length; i++) {
@@ -53,7 +53,7 @@ exports.getSalesMonth = async (req, res) => {
     ]);
     let totalIncome = 0;
     for (let i = 0; i < orders.length; i++) {
-      if (orders[i].status == 2)
+      if (orders[i].status == 0)
         totalIncome = totalIncome + orders[i].totalamount;
     }
     res.status(200).json({ success: true, totalIncome });
@@ -76,7 +76,7 @@ exports.getSalesByDateRange = async (req, res) => {
             { date: { $gte: previousPeriod1.toDate(), $lte: to1.toDate() } },
             { date: { $gte: previousPeriod2.toDate(), $lte: to2.toDate() } },
           ],
-          status: 2,
+          status: 0,
         },
       },
       {
@@ -125,7 +125,7 @@ exports.getSalesPerUser = async (req, res) => {
       const data = await Order.aggregate([
         {
           $match: {
-            $and: [{ initiateduser: users[i]._id }, { status: 2 }],
+            $and: [{ initiateduser: users[i]._id }, { status: 0 }],
           },
         },
       ]);
