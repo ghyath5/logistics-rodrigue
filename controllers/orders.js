@@ -300,28 +300,27 @@ exports.getOrdersByDate = async (req, res) => {
 };
 exports.getAllOrders = async (req, res) => {
   const { limit, page, done, backOrder } = req.query;
-  //all 0 1 2 3
-  // done = true => 2
-  // done = false => 0 1 2 3
+
   try {
-    const statusFilters =
-      done === "all"
-        ? {}
-        : done === "false"
-        ? { $or: [{ status: 0 }, { status: 1 }, { status: 3 }] }
-        : { status: 2 };
+    // const statusFilters =
+    //   done === "all"
+    //     ? {}
+    //     : done === "false"
+    //     ? { $or: [{ status: 0 }, { status: 1 }, { status: 3 }] }
+    //     : { status: 2 };
 
-    const backOrderFilters =
-      backOrder === "true"
-        ? { isBackOrder: true }
-        : backOrder === "false"
-        ? { isBackOrder: false }
-        : {};
+    // const backOrderFilters =
+    //   backOrder === "true"
+    //     ? { isBackOrder: true }
+    //     : backOrder === "false"
+    //     ? { isBackOrder: false }
+    //     : {};
 
-    const orders = await Order.find({
-      ...statusFilters,
-      ...backOrderFilters,
-    })
+    // const orders = await Order.find({
+    //   ...statusFilters,
+    //   ...backOrderFilters,
+    // })
+    const orders = await Order.find()
       .populate("customer")
       .populate({
         path: "products",

@@ -70,11 +70,6 @@ exports.validateCreateCustomer = [
     .not()
     .isEmpty()
     .withMessage("phonenumber is required"),
-  check("deliveryoccur")
-    .trim()
-    .not()
-    .isEmpty()
-    .withMessage("Deliveryoccur is required"),
   check("postcode")
     .trim()
     .not()

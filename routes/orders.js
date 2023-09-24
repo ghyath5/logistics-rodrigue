@@ -7,7 +7,6 @@ const {
   getAllOrders,
   sendCustomeIdToCreateOrder,
   searchOrderByProductText,
-  //  executeDeliveryOccur,
   exportOrdersAsExcelFile,
   getOrdersByDate,
 } = require("../controllers/orders");
@@ -31,7 +30,6 @@ router.route("/getordersbydate").get(verifyTokenAndAdmin, getOrdersByDate);
 
 router.route("/findbytext").post(verifyTokenAndAdmin, searchOrderByProductText);
 
-// router.route("/deliveryoccur").post(verifyTokenAndAdmin, executeDeliveryOccur);
 router.route("/export").get(exportOrdersAsExcelFile);
 
 router

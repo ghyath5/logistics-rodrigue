@@ -4,9 +4,7 @@ const SharedrecordsSchema = new mongoose.Schema(
   {
     customercodeid: { type: Number },
     productcodeid: { type: Number },
-    billercodeid: { type: Number },
     paymentmethodcodeid: { type: Number },
-    deliveryoccurcodeid: { type: Number },
     drivercodeid: { type: Number },
   },
   { timestamps: true }

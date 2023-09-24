@@ -111,8 +111,8 @@ exports.getAllComingRuns = async () => {
     const runs = await Run.find({ $or: [{ status: 0 }, { status: 1 }] });
     return runs || [];
   } catch (err) {
-    return [];
     await log(`getAllComingRuns error : ${err}`);
+    return [];
   }
 };
 exports.getAllRuns = async (req, res) => {
@@ -202,7 +202,7 @@ exports.findRunByDriverIdOrDate = async (req, res) => {
       .populate("driver")
       .limit(limit * 1)
       .skip((page - 1) * limit);
-     if (!found)
+    if (!found)
       return res
         .status(404)
         .json("no runs found for this driver or by this date");
