@@ -19,10 +19,6 @@ const CustomerSchema = new mongoose.Schema(
     mobilenumber: { type: String },
     directdialnumber: { type: String },
     deliveryfee: { type: Number, default: 0 },
-    // deliveryoccur: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Deliveriesoccur",
-    // },
     totalOrders: { type: Number, default: 0 },
     paymentmethod: {
       type: mongoose.Schema.Types.ObjectId,

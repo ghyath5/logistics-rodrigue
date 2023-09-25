@@ -136,6 +136,7 @@ exports.updateCostumer = async (req, res) => {
       return res.status(404).json("no costumer was found with this id");
     }
   } catch (err) {
+    console.log("err", err);
     await log(`updateCostumer error : ${err}`);
     res.status(500).json(err);
   }
@@ -228,6 +229,7 @@ exports.getCostumerPaginatedArchived = async (req, res) => {
       isarchived: isarchived,
     })
       .populate("paymentmethod")
+      .populate("routeId", "name")
       .sort("businessname")
       .limit(limit * 1)
       .skip((page - 1) * limit);
