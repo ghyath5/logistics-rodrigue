@@ -2,6 +2,9 @@ const Xero = require("../helpers/Xero");
 const Route = require("../models/Route");
 const { log } = require("../helpers/Loger");
 const Customer = require("../models/Customer");
+const Run = require("../models/Run");
+const Orders = require("../models/Orders");
+const CronScheduler = require("../models/CronScheduler");
 
 exports.createRoute = async (req, res) => {
   const { name } = req.body;
@@ -78,6 +81,8 @@ exports.updateRoute = async (req, res) => {
       }
     }
 
+    const oldRoute = await Route.findById(req.params.id);
+
     const updatedRoute = await Route.findByIdAndUpdate(
       req.params.id,
       {
@@ -85,6 +90,44 @@ exports.updateRoute = async (req, res) => {
       },
       { new: true }
     );
+
+    let cronScheduler = await CronScheduler.findOne();
+    if (!cronScheduler) {
+      cronScheduler = await CronScheduler.create({
+        lastRouteCleanup: new Date(),
+      });
+    }
+
+    // get the days that were removed
+    const removedDays = oldRoute.scheduledDays.filter(
+      (day) =>
+        !updatedRoute.scheduledDays.find(
+          (newDay) => newDay.day === day.day && newDay.calledCustomers.length
+        )
+    );
+
+    // delete the runs that has the removed days and date > cronScheduler.lastRouteCleanup
+    // run has a normal date field, wherease scheduledDays has a day field (1 -> 14),
+    // 1 is monday week 1, 8 is monday week 2, 2 is tuesday week 1, 9 is tuesday week 2, etc...
+    // get all runds > today first, then filter them by the removed days (use moment to compare dates)
+    const runs = await Run.find({
+      date: { $gt: cronScheduler.lastRouteCleanup },
+    });
+
+    const runsToDelete = runs.filter((run) => {
+      const runDay = moment(run.date).day();
+      // This method can be used to set the day of the week, with Sunday as 0 and Saturday as 6.
+      return removedDays.find(
+        (day) => day.day === runDay + 1 || day.day === runDay + 8
+      );
+    });
+
+    if (runsToDelete.length) {
+      for (let i = 0; i < runsToDelete.length; i++) {
+        await Run.findByIdAndDelete(runsToDelete[i]._id);
+        await Orders.deleteMany({ _id: { $in: runsToDelete[i].orders } });
+      }
+    }
 
     if (!updatedRoute) {
       return res.status(404).json("No route was found with this id !");

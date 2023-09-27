@@ -6,6 +6,10 @@ const SharedrecordsSchema = new mongoose.Schema(
     productcodeid: { type: Number },
     paymentmethodcodeid: { type: Number },
     drivercodeid: { type: Number },
+    routeCron: {
+      isFirstMonday: { type: Boolean },
+      firstMondayDate: { type: Date },
+    }
   },
   { timestamps: true }
 );

@@ -2,6 +2,7 @@ const cron = require("node-cron");
 const moment = require("moment");
 const Route = require("./models/Route");
 const CallLog = require("./models/callLog");
+const CronScheduler = require("./models/CronScheduler");
 
 console.log("initialized");
 
@@ -24,7 +25,16 @@ const runRouteCleanupTask = async () => {
 };
 
 // Cron job for the route cleanup (every 14 days at 1 am)
-const routeCronSchedule = cron.schedule("0 1 */14 * *", () => {
+const routeCronSchedule = cron.schedule("0 1 */14 * *", async () => {
+  const cronScheduler = await CronScheduler.findOne();
+  if (!cronScheduler) {
+    await CronScheduler.create({
+      lastRouteCleanup: new Date(),
+    });
+  } else {
+    cronScheduler.lastRouteCleanup = new Date();
+    await cronScheduler.save();
+  }
   runRouteCleanupTask();
 });
 
@@ -32,7 +42,7 @@ const routeCronSchedule = cron.schedule("0 1 */14 * *", () => {
 routeCronSchedule.stop();
 
 // Weekly cron job to check if it's Monday at 2 am
-const weeklyCronSchedule = cron.schedule("0 2 * * 1", () => {
+const weeklyCronSchedule = cron.schedule("0 2 * * 1", async () => {
   const today = new Date();
   if (today.getDay() === 1) {
     // monday, so start the route cleanup job and stop the weekly job
