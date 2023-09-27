@@ -24,10 +24,12 @@ const CustomerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Paymentmethod",
     },
-    routeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Route",
-    },
+    routeId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Route",
+      },
+    ],
     organization: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Organization",

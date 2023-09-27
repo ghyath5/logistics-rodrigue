@@ -54,18 +54,21 @@ exports.createCostumer = async (req, res) => {
     }
 
     const savedCustomer = await newCustomer.save();
-    await Route.findByIdAndUpdate(newCustomer.routeId, {
-      $push: { customers: savedCustomer._id },
-    });
-    await XeroHelper.synchCustomerToXero(savedCustomer);
-    res.status(200).json(savedCustomer);
-    await Sharedrecords.findByIdAndUpdate(
-      process.env.SHARED_RECORDS_ID,
-      {
-        $inc: { customercodeid: 1 },
-      },
-      { new: true }
-    );
+    //the line below is just because everything else is commented
+    return res.status(201).json({ success: true, message: savedCustomer });
+    // await Route.findByIdAndUpdate(newCustomer.routeId, {
+    //   $push: { customers: savedCustomer._id },
+    // });
+    // await XeroHelper.synchCustomerToXero(savedCustomer);
+    // res.status(200).json(savedCustomer);
+    // await Sharedrecords.findByIdAndUpdate(
+    //   process.env.SHARED_RECORDS_ID,
+    //   {
+    //     $inc: { customercodeid: 1 },
+    //   },
+    //   { new: true }
+    //   );
+    // then hon mafi return ?
   } catch (err) {
     await log(`createCustomer error : ${err}`);
     res.status(500).json(err);
@@ -106,31 +109,31 @@ exports.updateCostumer = async (req, res) => {
       { new: true }
     );
     if (updatedCustomer) {
-      const oldRoute = await Route.findOne({ customers: req.params.id });
-      const newRoute = await Route.findById(updatedCustomer.routeId);
-      if (updatedCustomer.routeId) {
-        await Route.findByIdAndUpdate(updatedCustomer.routeId, {
-          $push: { customers: req.params.id },
-        });
-        await XeroHelper.addContactToGroupXero(
-          updatedCustomer.xeroid,
-          newRoute.xeroid
-        );
-      }
-      if (
-        oldRoute &&
-        oldRoute._id.toString() !== updatedCustomer.routeId.toString()
-      ) {
-        await Route.findByIdAndUpdate(oldRoute._id, {
-          $pull: { customers: req.params.id },
-        });
-        await XeroHelper.removeContactFromGroupXero(
-          updatedCustomer.xeroid,
-          oldRoute.xeroid
-        );
-      }
+      // const oldRoute = await Route.findOne({ customers: req.params.id });
+      // const newRoute = await Route.findById(updatedCustomer.routeId);
+      // if (updatedCustomer.routeId) {
+      //   await Route.findByIdAndUpdate(updatedCustomer.routeId, {
+      //     $push: { customers: req.params.id },
+      //   });
+      //   await XeroHelper.addContactToGroupXero(
+      //     updatedCustomer.xeroid,
+      //     newRoute.xeroid
+      //   );
+      // }
+      // if (
+      //   oldRoute &&
+      //   oldRoute._id.toString() !== updatedCustomer.routeId.toString()
+      // ) {
+      //   await Route.findByIdAndUpdate(oldRoute._id, {
+      //     $pull: { customers: req.params.id },
+      //   });
+      //   await XeroHelper.removeContactFromGroupXero(
+      //     updatedCustomer.xeroid,
+      //     oldRoute.xeroid
+      //   );
+      // }
 
-      await XeroHelper.synchCustomerToXero(updatedCustomer);
+      // await XeroHelper.synchCustomerToXero(updatedCustomer);
       return res.status(200).json(updatedCustomer);
     } else {
       return res.status(404).json("no costumer was found with this id");
